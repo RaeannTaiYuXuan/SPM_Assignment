@@ -1,0 +1,134 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0A0A0A; /* Dark background color */
+    color: #FFFFFF; /* Light text color */
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking */
+    height: 100vh; /* Full viewport height */
+    background-image: url('bg.jpg'); /* Background image */
+    background-size: cover;
+    background-position: center;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    color: #00F0FF; /* Neon blue */
+    padding: 20px;
+    border-bottom: 2px solid #FF00FF; /* Neon pink border */
+}
+
+.top-bar a{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    color: #00F0FF; /* Neon blue */
+    padding: 20px;
+    text-decoration: none;
+    
+}
+
+.left-content, .center-content, .right-content {
+    flex: 1;
+    text-align: center;
+}
+
+.game-container {
+    position: relative; /* Add relative positioning */
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking */
+    align-items: center;
+    justify-content: center; /* Center content horizontally and vertically */
+    flex-grow: 1; /* Allow the game container to grow and take up remaining space */
+}
+
+.city-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 80px);
+    grid-template-rows: repeat(5, 80px);
+    gap: 5px; /* Space between cells */
+    margin-top: 20px; /* Adjust margin to create space between the top bar and grid */
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+    background-color: black;  /* Updated to translucent nicer green */
+    border: 2px solid #FF00FF; /* Neon pink border */
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    color: #FFFFFF; /* White text color */
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.cell:hover {
+    transform: scale(1.1);
+}
+
+.cell.house {
+    background-color: rgba(255, 0, 0, 0.8); /* Neon red */
+}
+
+.cell.road {
+    background-color: rgba(153, 51, 255, 0.8); /* Neon purple */
+}
+
+.cell.cafe {
+    background-color: rgba(255, 165, 0, 0.8); /* Neon orange */
+}
+
+.cell.tall-building {
+    background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute; /* Position the toolbar absolutely */
+    top: 50%; /* Place it at the vertical center */
+    left: 20px; /* Adjust the distance from the left */
+    transform: translateY(-50%); /* Center it vertically */
+}
+
+.toolbar-button {
+    background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
+    color: white;
+    border: 2px solid #00F0FF; /* Neon blue border */
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    transition: background-color 0.3s;
+}
+
+.toolbar-button:hover {
+    background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
+}
+
+/* Add styles for the reset button */
+.reset-button {
+    align-self: center; /* Center the reset button */
+    background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
+    color: white;
+    border: 2px solid #00F0FF; /* Neon blue border */
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px; /* Add margin to create space between the grid and reset button */
+}
+
+.reset-button:hover {
+    background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
+}
