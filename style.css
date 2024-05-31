@@ -73,20 +73,24 @@ body {
     transform: scale(1.1);
 }
 
-.cell.house {
+.cell.residential {
     background-color: rgba(255, 0, 0, 0.8); /* Neon red */
+}
+
+.cell.industry {
+    background-color: rgba(0, 0, 255, 0.8); /* Neon blue */
+}
+
+.cell.commercial {
+    background-color: rgba(0, 255, 0, 0.8); /* Neon green */
+}
+
+.cell.park {
+    background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
 }
 
 .cell.road {
     background-color: rgba(153, 51, 255, 0.8); /* Neon purple */
-}
-
-.cell.cafe {
-    background-color: rgba(255, 165, 0, 0.8); /* Neon orange */
-}
-
-.cell.tall-building {
-    background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
 }
 
 .toolbar {
@@ -103,17 +107,32 @@ body {
     background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
     color: white;
     border: 2px solid #00F0FF; /* Neon blue border */
-    width: 80px;
-    height: 80px;
-    margin-bottom: 10px;
+    width: 100px;
+    height: 90px; /* Reduce height */
     border-radius: 10px;
+    margin-bottom: 15px;
     cursor: pointer;
     font-size: 24px;
     transition: background-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .toolbar-button:hover {
     background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
+}
+
+.toolbar-button lord-icon {
+    margin-top: 10px;
+}
+
+.button-text {
+    font-size: 13px;
+    text-align: center;
+    margin-top: auto; /* Ensure text is at the bottom */
+    margin-bottom: 20px;
 }
 
 /* Add styles for the reset button */
@@ -132,7 +151,6 @@ body {
 .reset-button:hover {
     background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
 }
-
 
 .city-grid-arcade {
     display: grid;
@@ -174,4 +192,54 @@ body {
 
 .cell-arcade.tall-building {
     background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
+}
+
+
+/* Overlay styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    visibility: hidden; /* Hidden by default */
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s;
+}
+
+.overlay-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: #000;
+}
+
+.overlay-content p {
+    margin: 0 0 20px 0;
+}
+
+.overlay-content button {
+    padding: 10px 20px;
+    border: none;
+    background: #00F0FF;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.overlay-content button:hover {
+    background: #42a9f0;
+}
+
+/* Show overlay */
+.overlay.show {
+    visibility: visible;
+    opacity: 1;
 }
