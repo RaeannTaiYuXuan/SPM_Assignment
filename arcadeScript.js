@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.dataset.col = i % gridSize; // Store column index in data attribute
         cell.addEventListener('click', () => placeBuilding(cell)); // Add click event listener to place a building
         cityGridArcade.appendChild(cell); // Append the cell to the grid container
-    }
+    }//
 
     // Start a new round of the game
     function startNewRound() {
