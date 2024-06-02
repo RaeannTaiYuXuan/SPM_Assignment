@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         park: document.getElementById('parkButton'),
         road: document.getElementById('roadButton')
     };
+    const coinsHTML = document.getElementById('coins');
 
     // Initialize game variables
     let currentBuilding = ''; // Tracks the currently selected building
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start a new round of the game
     function startNewRound() {
+        coinsHTML.textContent = `${coins} coins`; // Update the coins value on the screen 
         if (coins > 0) { // Check if there are coins left
             roundNo++; // Increment the round number
             coins--; // Decrement the number of coins
