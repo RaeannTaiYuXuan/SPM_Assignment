@@ -1,9 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const cityGridArcade = document.getElementById('cityGridArcade');
-    const houseButton = document.getElementById('houseButton');
+    const industryButton = document.getElementById('industryButton');
+    const commercialButton = document.getElementById('commercialButton');
+    const parkButton = document.getElementById('parkButton');
     const roadButton = document.getElementById('roadButton');
-    const cafeButton = document.getElementById('cafeButton');
-    const tallBuildingButton = document.getElementById('tallBuildingButton');
+    const residentialButton = document.getElementById('residentialButton');
+    const overlay = document.getElementById('overlay');
+    const overlayCloseButton = document.getElementById('overlayCloseButton');
     const resetButtonArcade = document.getElementById('resetButtonArcade');
     let currentBuilding = '';
 
@@ -15,43 +18,65 @@ document.addEventListener('DOMContentLoaded', () => {
         cityGridArcade.appendChild(cell);
     }
 
-    // Event listener for house button
-    houseButton.addEventListener('click', () => {
-        currentBuilding = 'house';
+    // Event listener for building buttons
+    residentialButton.addEventListener('click', () => {
+        currentBuilding = 'residential';
+        showOverlay();
     });
 
-    // Event listener for road button
+    industryButton.addEventListener('click', () => {
+        currentBuilding = 'industry';
+        showOverlay();
+    });
+
+    commercialButton.addEventListener('click', () => {
+        currentBuilding = 'commercial';
+        showOverlay();
+    });
+
+    parkButton.addEventListener('click', () => {
+        currentBuilding = 'park';
+        showOverlay();
+    });
+
     roadButton.addEventListener('click', () => {
         currentBuilding = 'road';
+        showOverlay();
     });
 
-    // Event listener for cafe button
-    cafeButton.addEventListener('click', () => {
-        currentBuilding = 'cafe';
-    });
-
-    // Event listener for tall building button
-    tallBuildingButton.addEventListener('click', () => {
-        currentBuilding = 'tall-building';
-    });
-
-    // Event listener for reset button
-    resetButtonArcade.addEventListener('click', () => {
+     // Event listener for reset button
+     resetButtonArcade.addEventListener('click', () => {
         resetGrid();
     });
 
+    overlayCloseButton.addEventListener('click', () => {
+        hideOverlay();
+    });
+
+    function showOverlay() {
+        overlay.classList.add('show');
+    }
+
+    function hideOverlay() {
+        overlay.classList.remove('show');
+    }
+
     function placeBuilding(cell) {
         if (currentBuilding) {
-            cell.classList.remove('house', 'road', 'cafe', 'tall-building'); // Remove all building classes
+            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road'); // Remove all building classes
             cell.classList.add(currentBuilding);
             updateCellIcon(cell, currentBuilding); // Update cell icon for the building type
+            currentBuilding = ''; // Reset the current building selection after placement
+            hideOverlay(); // Hide the overlay
+        } else {
+            alert('Select a building first.'); // When user tries to select location on grid to place building but they have not chosen which building to build yet
         }
     }
 
     function resetGrid() {
         const cells = document.querySelectorAll('.cell-arcade');
         cells.forEach(cell => {
-            cell.classList.remove('house', 'road', 'cafe', 'tall-building'); // Remove all building classes
+            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road'); // Remove all building classes
             cell.innerHTML = ''; // Clear the content
         });
     }
@@ -59,17 +84,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCellIcon(cell, buildingType) {
         let icon;
         switch (buildingType) {
-            case 'house':
+            case 'residential':
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
+                break;
+            case 'industry':
+                icon = createLordicon("https://cdn.lordicon.com/zneicxkd.json");
+                break;
+            case 'commercial':
+                icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
+                break;
+            case 'park':
+                icon = createLordicon("https://cdn.lordicon.com/gfseemfv.json");
                 break;
             case 'road':
                 icon = createLordicon("https://cdn.lordicon.com/zneicxkd.json");
-                break;
-            case 'cafe':
-                icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
-                break;
-            case 'tall-building':
-                icon = createLordicon("https://cdn.lordicon.com/gfseemfv.json");
                 break;
             default:
                 return;
