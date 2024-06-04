@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Building Game</title>
-    <a href="https://lordicon.com/"></a>
+    <title>Arcade City Building Game</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.lordicon.com/lusqsztk.js"></script>
 </head>
 <body>
     <div class="top-bar">
-        <div class="left-content">$1000</div>
+        <div class="left-content" id = "coins"></div>
         <div class="center-content"><a href="#">Ngee Ann City</a></div>
         <div class="right-content"><a href="index.html">Back to Home</a></div>
     </div>
     <div class="game-container" id="gameContainer">
-        <div class="city-grid" id="cityGrid"></div>
+        <div class="city-grid-arcade" id="cityGridArcade"></div>
         <div class="toolbar">
             <button id="residentialButton" class="toolbar-button">
                 <script src="https://cdn.lordicon.com/lordicon.js"></script>
@@ -43,15 +43,9 @@
             </button>
         </div>
         <div class="button-container">
-            <button id="resetButton" class="reset-button">Reset</button>
-        </div>
-        <div class="overlay" id="overlay">
-            <div class="overlay-content">
-                <p>Select anywhere on grid to construct the building.</p>
-                <button id="overlayCloseButton">OK</button>
-            </div>
+            <button id="resetButtonArcade" class="reset-button">Reset</button>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script src="arcadeScript.js"></script>
 </body>
 </html>
