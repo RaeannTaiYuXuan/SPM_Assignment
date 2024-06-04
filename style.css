@@ -1,0 +1,249 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0A0A0A; /* Dark background color */
+    color: #FFFFFF; /* Light text color */
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking */
+    height: 100vh; /* Full viewport height */
+    background-image: url('bg.jpg'); /* Background image */
+    background-size: cover;
+    background-position: center;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    color: #00F0FF; /* Neon blue */
+    padding: 20px;
+    border-bottom: 2px solid #FF00FF; /* Neon pink border */
+}
+
+.top-bar a{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    color: #00F0FF; /* Neon blue */
+    padding: 20px;
+    text-decoration: none;
+    
+}
+
+.left-content, .center-content, .right-content {
+    flex: 1;
+    text-align: center;
+}
+
+.game-container {
+    position: relative; /* Add relative positioning */
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking */
+    align-items: center;
+    justify-content: center; /* Center content horizontally and vertically */
+    flex-grow: 1; /* Allow the game container to grow and take up remaining space */
+}
+
+.city-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 80px);
+    grid-template-rows: repeat(5, 80px);
+    gap: 5px; /* Space between cells */
+    margin-top: 20px; /* Adjust margin to create space between the top bar and grid */
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+    background-color: black;  /* Updated to translucent nicer green */
+    border: 2px solid #FF00FF; /* Neon pink border */
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    color: #FFFFFF; /* White text color */
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.cell:hover {
+    transform: scale(1.1);
+}
+
+.cell.residential {
+    background-color: rgba(255, 0, 0, 0.8); /* Neon red */
+}
+
+.cell.industry {
+    background-color: rgba(0, 0, 255, 0.8); /* Neon blue */
+}
+
+.cell.commercial {
+    background-color: rgba(0, 255, 0, 0.8); /* Neon green */
+}
+
+.cell.park {
+    background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
+}
+
+.cell.road {
+    background-color: rgba(153, 51, 255, 0.8); /* Neon purple */
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute; /* Position the toolbar absolutely */
+    top: 50%; /* Place it at the vertical center */
+    left: 20px; /* Adjust the distance from the left */
+    transform: translateY(-50%); /* Center it vertically */
+}
+
+.toolbar-button {
+    background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
+    color: white;
+    border: 2px solid #00F0FF; /* Neon blue border */
+    width: 100px;
+    height: 90px; /* Reduce height */
+    border-radius: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    font-size: 24px;
+    transition: background-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.toolbar-button:hover {
+    background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
+}
+
+.toolbar-button lord-icon {
+    margin-top: 10px;
+}
+
+.button-text {
+    font-size: 13px;
+    text-align: center;
+    margin-top: auto; /* Ensure text is at the bottom */
+    margin-bottom: 20px;
+}
+
+/* Add styles for the reset button */
+.reset-button {
+    align-self: center; /* Center the reset button */
+    background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
+    color: white;
+    border: 2px solid #00F0FF; /* Neon blue border */
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px; /* Add margin to create space between the grid and reset button */
+}
+
+.reset-button:hover {
+    background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
+}
+
+.city-grid-arcade {
+    display: grid;
+    grid-template-columns: repeat(20, 29px); /* Adjust the size as needed */
+    grid-template-rows: repeat(20, 29px);
+    gap: 2px; /* Space between cells */
+    margin-top: 20px; /* Adjust margin to create space between the top bar and grid */
+}
+
+.cell-arcade {
+    width: 29px;
+    height: 29px;
+    background-color: black;
+    border: 2px solid #FF00FF; /* Neon pink border */
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: #FFFFFF; /* White text color */
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.cell-arcade:hover {
+    transform: scale(1.1);
+}
+
+.cell-arcade.house {
+    background-color: rgba(255, 0, 0, 0.8); /* Neon red */
+}
+
+.cell-arcade.road {
+    background-color: rgba(153, 51, 255, 0.8); /* Neon purple */
+}
+
+.cell-arcade.cafe {
+    background-color: rgba(255, 165, 0, 0.8); /* Neon orange */
+}
+
+.cell-arcade.tall-building {
+    background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
+}
+
+
+/* Overlay styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    visibility: hidden; /* Hidden by default */
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s;
+}
+
+.overlay-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: #000;
+}
+
+.overlay-content p {
+    margin: 0 0 20px 0;
+}
+
+.overlay-content button {
+    padding: 10px 20px;
+    border: none;
+    background: #00F0FF;
+    color: #fff;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.overlay-content button:hover {
+    background: #42a9f0;
+}
+
+/* Show overlay */
+.overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+.greyed-out{
+    opacity: 0.5;
+    pointer-events: none;
+}
