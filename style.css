@@ -30,7 +30,6 @@ body {
     color: #00F0FF; /* Neon blue */
     padding: 20px;
     text-decoration: none;
-    
 }
 
 .left-content, .center-content, .right-content {
@@ -135,9 +134,9 @@ body {
     margin-bottom: 20px;
 }
 
-/* Add styles for the reset button */
-.reset-button {
-    align-self: center; /* Center the reset button */
+/* Add styles for the reset and save buttons */
+.reset-button, .save-button {
+    align-self: center; /* Center the buttons */
     background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
     color: white;
     border: 2px solid #00F0FF; /* Neon blue border */
@@ -145,11 +144,19 @@ body {
     border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 20px; /* Add margin to create space between the grid and reset button */
+    margin: 10px; /* Add margin to create space between the buttons */
 }
 
-.reset-button:hover {
+.reset-button:hover, .save-button:hover {
     background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
+}
+
+/* Additional styles for positioning if needed */
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px; /* Adjust margin to create space between the grid and buttons */
 }
 
 .city-grid-arcade {

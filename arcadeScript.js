@@ -1,8 +1,8 @@
-// Run the script once the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     // Get references to the main elements in the DOM
     const cityGridArcade = document.getElementById('cityGridArcade');
     const resetButtonArcade = document.getElementById('resetButtonArcade');
+    const saveButtonArcade = document.getElementById('saveButtonArcade');
     const buildingButtons = {
         residential: document.getElementById('residentialButton'),
         industry: document.getElementById('industryButton'),
@@ -29,7 +29,39 @@ document.addEventListener('DOMContentLoaded', () => {
         cityGridArcade.appendChild(cell); // Append the cell to the grid container
     }
 
-    // Start a new round of the game
+    // Function to save the current game state
+    function saveGame() {
+        const gameState = {
+            grid: grid,
+            coins: coins,
+            roundNo: roundNo
+        };
+        localStorage.setItem('arcadeGameState', JSON.stringify(gameState));
+        alert('Game Saved!');
+    }
+
+    // Attach the save button event listener
+    saveButtonArcade.addEventListener('click', saveGame);
+
+    // Reset the grid to its initial state
+    function resetGrid() {
+        const cells = document.querySelectorAll('.cell-arcade');
+        cells.forEach(cell => {
+            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road'); // Remove all building classes
+            cell.innerHTML = ''; // Clear the content
+        });
+        grid = Array(gridSize).fill().map(() => Array(gridSize).fill(null)); // Reset grid state
+        coins = 16; // Reset coins
+        roundNo = 0; // Reset round number
+        startNewRound(); // Start a new round
+    }
+
+    // Attach the reset button event listener
+    resetButtonArcade.addEventListener('click', () => {
+        resetGrid();
+    });
+
+    // Function to start a new round
     function startNewRound() {
         coinsHTML.textContent = `${coins} coins`; // Update the coins value on the screen 
         if (coins > 0) { // Check if there are coins left
@@ -106,25 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol];
         });
     }
-    
-
-    // Reset the grid to its initial state
-    function resetGrid() {
-        const cells = document.querySelectorAll('.cell-arcade');
-        cells.forEach(cell => {
-            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road'); // Remove all building classes
-            cell.innerHTML = ''; // Clear the content
-        });
-        grid = Array(gridSize).fill().map(() => Array(gridSize).fill(null)); // Reset grid state
-        coins = 16; // Reset coins
-        roundNo = 0; // Reset round number
-        startNewRound(); // Start a new round
-    }
-
-    // Attach the reset button event listener
-    resetButtonArcade.addEventListener('click', () => {
-        resetGrid();
-    });
 
     // Update the cell with the appropriate building icon
     function updateCellIcon(cell, buildingType) {
