@@ -2,6 +2,25 @@ let gridSize = 5; // Initial grid size
 let coins = 1000; // Initial coins
 let currentBuilding = '';
 
+// Define the upkeep costs for each building type
+const upkeepCosts = {
+    residential: 1,
+    industry: 1,
+    commercial: 2,
+    park: 1,
+    road: 1
+};
+
+// Define the earning rates for each building type
+const earningRates = {
+    residential: 1,
+    industry: 2,
+    commercial: 3,
+    park: 0, // Parks don't generate coins
+    road: 0 // Roads don't generate coins
+};
+
+
 // Create the initial grid
 function createGrid(size) {
     cityGrid.innerHTML = ''; // Clear the existing grid
@@ -65,19 +84,81 @@ function isOccupied(cell) {
 }
 
 // Place a building and handle expansion if all border cells are filled
+// Place a building and handle expansion if all border cells are filled
 function placeBuilding(cell, index) {
-    if (currentBuilding) {
-        cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
-        cell.classList.add(currentBuilding);
-        updateCellIcon(cell, currentBuilding);
-        if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
-            expandGrid();
+    const buildingCost = 1; // Base construction cost for any building
+    if (coins >= buildingCost) {
+        // Check if the cell is occupied by a building
+        if (isOccupied(cell)) {
+            const buildingType = Array.from(cell.classList).find(cls => cls !== 'cell'); // Get the building type from the cell's class
+            console.log("Building type:", buildingType); // Debug statement
+
+            const upkeepCost = upkeepCosts[buildingType]; // Get the upkeep cost
+            console.log("Upkeep cost:", upkeepCost); // Debug statement
+
+            if (typeof upkeepCost !== 'undefined') {
+                if (confirm(`This building requires ${upkeepCost} coins for upkeep. Do you want to proceed?`)) {
+                    // Deduct upkeep cost from coins
+                    coins -= upkeepCost;
+
+                    if (coins >= 0) {
+                        console.log(`Building successfully maintained. ${upkeepCost} coins deducted. Current coins: ${coins}`);
+                    } else {
+                        // If coins are insufficient after upkeep, refund the deducted coins and alert the user
+                        coins += upkeepCost;
+                        alert("Insufficient coins for upkeep!");
+                        updateCoinsDisplay(); // Update coins display after refund
+                        return;
+                    }
+
+                    updateCoinsDisplay(); // Update coins display after upkeep deduction
+                } else {
+                    // User canceled upkeep, return without deducting coins
+                    console.log('Upkeep canceled by user.');
+                    return;
+                }
+            } else {
+                // Upkeep cost is not defined for the building type
+                alert('Upkeep cost is not defined for this building type.');
+                return;
+            }
+        } else {
+            // Cell doesn't contain a building, proceed with construction
+            if (currentBuilding) {
+                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+                cell.classList.add(currentBuilding);
+                updateCellIcon(cell, currentBuilding);
+
+                // Deduct construction cost from coins
+                coins -= buildingCost;
+                console.log(`Construction successful. ${buildingCost} coins deducted. Current coins: ${coins}`);
+
+                // Calculate earnings if the building type generates coins
+                const earning = calculateCoinEarnings(currentBuilding);
+                coins += earning; // Add earnings to coins
+                console.log(`Earnings from building: ${earning}. Current coins: ${coins}`);
+
+                // Update coins display
+                updateCoinsDisplay();
+
+                if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
+                    expandGrid();
+                }
+                currentBuilding = '';
+                hideOverlay();
+            } else {
+                alert('Select a building first.');
+            }
         }
-        currentBuilding = '';
-        hideOverlay();
     } else {
-        alert('Select a building first.');
+        alert('Insufficient coins to construct the building.');
     }
+}
+
+
+// Calculate coin earnings based on building type
+function calculateCoinEarnings(buildingType) {
+    return earningRates[buildingType];
 }
 
 // Initialize event listeners for building buttons
@@ -118,10 +199,13 @@ resetButton.addEventListener('click', () => {
     updateCoinsDisplay();
 });
 
+
 // Update the coin display
 function updateCoinsDisplay() {
     document.querySelector('.left-content').textContent = `$${coins}`;
 }
+
+
 
 // Show and hide overlay functions
 function showOverlay() {
