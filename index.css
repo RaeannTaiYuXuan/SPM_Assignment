@@ -86,3 +86,90 @@ body {
     pointer-events: none;
 }
 
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    visibility: hidden; /* Hidden by default */
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s;
+}
+
+.overlay-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: #000;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    max-width: 400px;
+    width: 100%;
+}
+
+.overlay-content h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.overlay-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.overlay-content select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+    width: 45%;
+}
+
+.btn-primary {
+    background-color: #00F0FF;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #42a9f0;
+}
+
+.btn-secondary {
+    background-color: #ccc;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #aaa;
+}
+
+/* Show overlay */
+.overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
