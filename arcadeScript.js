@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         road: document.getElementById('roadButton')
     };
     const coinsHTML = document.getElementById('coins');
+    const scoreDisplay = document.getElementById('scoreDisplay');
 
     // Initialize game variables
     let currentBuilding = ''; // Tracks the currently selected building
@@ -53,13 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
         grid = Array(gridSize).fill().map(() => Array(gridSize).fill(null)); // Reset grid state
         coins = 16; // Reset coins
         roundNo = 0; // Reset round number
+        updateScoreDisplay(); // Reset score display
         startNewRound(); // Start a new round
     }
 
     // Attach the reset button event listener
-    resetButtonArcade.addEventListener('click', () => {
-        resetGrid();
-    });
+    resetButtonArcade.addEventListener('click', resetGrid);
 
     // Function to start a new round
     function startNewRound() {
@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert('You have no more coins!'); // Alert the user if no coins are left
         }
+        updateScoreDisplay(); // Update the score display
     }
 
     // Grey out the buildings that are not selected for this round
@@ -115,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cell.classList.add(currentBuilding); // Add the current building class
             updateCellIcon(cell, currentBuilding); // Update the cell with the building icon
             grid[row][col] = currentBuilding; // Update the grid state
+            regenerateCoins(row, col, currentBuilding); // Regenerate coins based on the new building
             currentBuilding = ''; // Reset the current building selection after placement
             startNewRound(); // Start a new round
         } else if (roundNo !== 1) {
@@ -122,6 +124,30 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             alert('Select a building first.'); // Alert the user if no building is selected
         }
+        updateScoreDisplay(); // Update the score display after placing a building
+    }
+
+    // Regenerate coins based on building placement
+    function regenerateCoins(row, col, building) {
+        let additionalCoins = 0;
+        switch (building) {
+            case 'industry':
+                additionalCoins = countAdjacentBuildings(row, col, 'residential');
+                break;
+            case 'commercial':
+                additionalCoins = countAdjacentBuildings(row, col, 'residential');
+                break;
+            default:
+                break;
+        }
+        coins += additionalCoins;
+        coinsHTML.textContent = `${coins} coins`; // Update the coins value on the screen
+    }
+
+    // Count adjacent buildings of a specific type
+    function countAdjacentBuildings(row, col, buildingType) {
+        const neighbors = getNeighbors(row, col);
+        return neighbors.filter(([r, c]) => grid[r][c] === buildingType).length;
     }
 
     // Check if the cell is next to an existing building
@@ -175,5 +201,130 @@ document.addEventListener('DOMContentLoaded', () => {
         return icon;
     }
 
+    // Calculate scores for different building types
+    function calculateScore() {
+        let score = 0;
+        let industryCount = 0;
+
+        // Calculate score for each type of building
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                if (grid[row][col] !== null) {
+                    switch (grid[row][col]) {
+                        case 'residential':
+                            score += scoreResidential(row, col);
+                            break;
+                        case 'industry':
+                            industryCount++;
+                            break;
+                        case 'commercial':
+                            score += scoreCommercial(row, col);
+                            break;
+                        case 'park':
+                            score += scorePark(row, col);
+                            break;
+                        case 'road':
+                            score += scoreRoad(row, col);
+                            break;
+                    }
+                }
+            }
+        }
+        score += industryCount; // Add the total industry count to the score once
+        return score;
+    }
+
+    // Helper functions to calculate scores for each type of building
+    function scoreResidential(row, col) {
+        const neighbors = getNeighbors(row, col);
+        let score = 0;
+        let nextToIndustry = false;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'industry') {
+                nextToIndustry = true;
+                break;
+            }
+        }
+        if (nextToIndustry) {
+            return 1;
+        }
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'residential' || grid[neighbor[0]][neighbor[1]] === 'commercial') {
+                score += 1;
+            } else if (grid[neighbor[0]][neighbor[1]] === 'park') {
+                score += 2;
+            }
+        }
+        return score;
+    }
+
+    function scoreIndustry(row, col) {
+        let industryCount = 0;
+        for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+                if (grid[r][c] === 'industry') {
+                    industryCount++;
+                }
+            }
+        }
+        return industryCount; // Each industry scores based on the total number of industries in the city
+    }
+
+    function scoreCommercial(row, col) {
+        const neighbors = getNeighbors(row, col);
+        let score = 0;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'commercial') {
+                score += 1;
+            }
+        }
+        return score;
+    }
+
+    function scorePark(row, col) {
+        const neighbors = getNeighbors(row, col);
+        let score = 0;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'park') {
+                score += 1;
+            }
+        }
+        return score;
+    }
+
+    function scoreRoad(row, col) {
+        const rowCells = grid[row];
+        let score = 0;
+        let consecutiveRoads = 0;
+        for (let c = 0; c < gridSize; c++) {
+            if (rowCells[c] === 'road') {
+                consecutiveRoads++;
+                if (consecutiveRoads > 1) {
+                    score++;
+                }
+            } else {
+                consecutiveRoads = 0;
+            }
+        }
+        return score;
+    }
+
+    // Get neighboring cells
+    function getNeighbors(row, col) {
+        const directions = [
+            [-1, 0], [1, 0], [0, -1], [0, 1] // up, down, left, right
+        ];
+        return directions
+            .map(([dx, dy]) => [row + dx, col + dy])
+            .filter(([r, c]) => r >= 0 && r < gridSize && c >= 0 && c < gridSize);
+    }
+
+    // Update the score display
+    function updateScoreDisplay() {
+        const score = calculateScore();
+        scoreDisplay.textContent = `Score: ${score}`;
+    }
+
     startNewRound(); // Start the first round
 });
+
