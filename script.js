@@ -1,6 +1,7 @@
 let gridSize = 5; // Initial grid size
 let coins = 1000; // Initial coins
 let currentBuilding = '';
+let demolitionMode = false; // Flag to indicate if we are in demolition mode
 
 // Define the upkeep costs for each building type
 const upkeepCosts = {
@@ -20,7 +21,6 @@ const earningRates = {
     road: 0 // Roads don't generate coins
 };
 
-
 // Create the initial grid
 function createGrid(size) {
     cityGrid.innerHTML = ''; // Clear the existing grid
@@ -28,7 +28,7 @@ function createGrid(size) {
         const cell = document.createElement('div');
         cell.classList.add('cell');
         cell.dataset.index = i;
-        cell.addEventListener('click', () => placeBuilding(cell, i));
+        cell.addEventListener('click', (event) => handleCellClick(cell, i, event));
         cityGrid.appendChild(cell);
     }
     cityGrid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
@@ -83,7 +83,15 @@ function isOccupied(cell) {
            cell.classList.contains('road');
 }
 
-// Place a building and handle expansion if all border cells are filled
+// Handle cell click for both placing and demolishing buildings
+function handleCellClick(cell, index, event) {
+    if (demolitionMode) {
+        handleDemolition(cell);
+    } else {
+        placeBuilding(cell, index);
+    }
+}
+
 // Place a building and handle expansion if all border cells are filled
 function placeBuilding(cell, index) {
     const buildingCost = 1; // Base construction cost for any building
@@ -155,7 +163,6 @@ function placeBuilding(cell, index) {
     }
 }
 
-
 // Calculate coin earnings based on building type
 function calculateCoinEarnings(buildingType) {
     return earningRates[buildingType];
@@ -199,13 +206,10 @@ resetButton.addEventListener('click', () => {
     updateCoinsDisplay();
 });
 
-
 // Update the coin display
 function updateCoinsDisplay() {
     document.querySelector('.left-content').textContent = `$${coins}`;
 }
-
-
 
 // Show and hide overlay functions
 function showOverlay() {
@@ -250,6 +254,30 @@ function createLordicon(src) {
     icon.style.height = '40px';
     return icon;
 }
+
+// Function to handle demolishing a building
+function demolishBuilding() {
+    alert('Choose a cell with a building to demolish.');
+    demolitionMode = true; // Set demolition mode to true
+}
+
+function handleDemolition(cell) {
+    if (isOccupied(cell)) {
+        if (confirm('Are you sure you want to demolish this building?')) {
+            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+            cell.innerHTML = ''; // Remove any icons or inner content
+            coins += 1; // Award 1 coin for demolishing the building
+            updateCoinsDisplay();
+            alert('Building demolished. You earned 1 coin.');
+        }
+    } else {
+        alert('This cell is empty. Choose a cell with a building to demolish.');
+    }
+    demolitionMode = false; // Reset demolition mode
+}
+
+// Initialize event listener for the demolish button
+demolishButton.addEventListener('click', demolishBuilding);
 
 // Initial setup
 updateCoinsDisplay();
