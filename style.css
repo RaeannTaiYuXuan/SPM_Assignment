@@ -22,7 +22,7 @@ body {
     border-bottom: 2px solid #FF00FF; /* Neon pink border */
 }
 
-.top-bar a{
+.top-bar a {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -134,8 +134,8 @@ body {
     margin-bottom: 20px;
 }
 
-/* Add styles for the reset and save buttons */
-.reset-button, .save-button {
+/* Add styles for the reset, save, and demolish buttons */
+.reset-button, .save-button, .demolish-button {
     align-self: center; /* Center the buttons */
     background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
     color: white;
@@ -147,7 +147,7 @@ body {
     margin: 10px; /* Add margin to create space between the buttons */
 }
 
-.reset-button:hover, .save-button:hover {
+.reset-button:hover, .save-button:hover, .demolish-button:hover {
     background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
 }
 
@@ -201,7 +201,6 @@ body {
     background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
 }
 
-
 /* Overlay styles */
 .overlay {
     position: fixed;
@@ -250,7 +249,8 @@ body {
     visibility: visible;
     opacity: 1;
 }
-.greyed-out{
+
+.greyed-out {
     opacity: 0.5;
     pointer-events: none;
 }
