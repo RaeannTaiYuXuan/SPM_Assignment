@@ -22,7 +22,7 @@ body {
     border-bottom: 2px solid #FF00FF; /* Neon pink border */
 }
 
-.top-bar a{
+.top-bar a {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -30,7 +30,6 @@ body {
     color: #00F0FF; /* Neon blue */
     padding: 20px;
     text-decoration: none;
-    
 }
 
 .left-content, .center-content, .right-content {
@@ -135,9 +134,9 @@ body {
     margin-bottom: 20px;
 }
 
-/* Add styles for the reset button */
-.reset-button {
-    align-self: center; /* Center the reset button */
+/* Add styles for the reset, save, and demolish buttons */
+.reset-button, .save-button, .demolish-button {
+    align-self: center; /* Center the buttons */
     background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
     color: white;
     border: 2px solid #00F0FF; /* Neon blue border */
@@ -145,29 +144,20 @@ body {
     border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 20px; /* Add margin to create space between the grid and reset button */
+    margin: 10px; /* Add margin to create space between the buttons */
 }
 
-.reset-button:hover {
+.reset-button:hover, .save-button:hover, .demolish-button:hover {
     background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
 }
 
-.demolish-button {
-    align-self: center; /* Center the demolish button */
-    background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
-    color: white;
-    border: 2px solid #00F0FF; /* Neon blue border */
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px; /* Add margin to create space between the grid and demolish button */
+/* Additional styles for positioning if needed */
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px; /* Adjust margin to create space between the grid and buttons */
 }
-
-.demolish-button:hover {
-    background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
-}
-
 
 .city-grid-arcade {
     display: grid;
@@ -210,7 +200,6 @@ body {
 .cell-arcade.tall-building {
     background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
 }
-
 
 /* Overlay styles */
 .overlay {
@@ -260,7 +249,8 @@ body {
     visibility: visible;
     opacity: 1;
 }
-.greyed-out{
+
+.greyed-out {
     opacity: 0.5;
     pointer-events: none;
 }
