@@ -37,6 +37,18 @@ body {
     text-align: center;
 }
 
+/* Additional styles for the top-bar content */
+.top-bar .left-content, .top-bar .center-content, .top-bar .right-content {
+    flex: 1;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.top-bar .center-content span {
+    margin: 0 10px;
+}
+
+
 .game-container {
     position: relative; /* Add relative positioning */
     display: flex;
