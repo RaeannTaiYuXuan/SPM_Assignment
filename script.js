@@ -229,7 +229,18 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Save cancelled or invalid name entered.');
             return;
         }
+
+        // Check if the game name already exists in localStorage
+        const existingGameNames = Object.keys(localStorage)
+        .filter(key => key.startsWith('gameState_'))
+        .map(key => key.replace('gameState_', ''));
+        if (existingGameNames.includes(fileName)) {
+            alert('A game with this name already exists. Please choose a different name.');
+            return;
+        }
+
         const gameState = {
+            pageType: window.location.pathname.includes('ArcadeGame') ? 'ArcadeGame' : 'FreePlay',
             gridSize: gridSize,
             coins: coins,
             cells: Array.from(document.querySelectorAll('.cell')).map(cell => ({
@@ -237,9 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 innerHTML: cell.innerHTML
             }))
         };
-        localStorage.setItem(`freePlayGameState_${fileName}`, JSON.stringify(gameState));
+        localStorage.setItem(`gameState_${fileName}`, JSON.stringify(gameState));
         alert('Game Saved!');
-    }        
+    }
 
     // Function to load the saved game state from sessionStorage
     function loadGameState() {
@@ -264,8 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionStorage.removeItem('loadedGameState'); // Clear the sessionStorage after loading
     }
 
-    // Call the loadGameState function if there's a saved game state
-    loadGameState();
+
 
     // Attach the save button event listener
     saveButton.addEventListener('click', saveGame);
@@ -346,4 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial setup
     updateCoinsDisplay();
     createGrid(gridSize);
+
+    // Call the loadGameState function if there's a saved game state
+    loadGameState();
 });

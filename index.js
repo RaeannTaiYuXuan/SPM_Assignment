@@ -11,19 +11,6 @@ function exitGame() {
     }
 }
 
-// Show the load game overlay
-function showLoadGameOverlay() {
-    const overlay = document.getElementById('loadGameOverlay');
-    overlay.classList.add('show');
-    populateSavedGames();
-}
-
-// Hide the load game overlay
-function hideLoadGameOverlay() {
-    const overlay = document.getElementById('loadGameOverlay');
-    overlay.classList.remove('show');
-}
-
 // Populate the saved games dropdown (dummy data for demonstration)
 function populateSavedGames() {
     const savedGames = [
@@ -41,14 +28,48 @@ function populateSavedGames() {
     });
 }
 
-// Load the selected saved game
+function showLoadGameOverlay() {
+    const overlay = document.getElementById('loadGameOverlay');
+    overlay.classList.add('show');
+    populateSavedGames();
+}
+
+function hideLoadGameOverlay() {
+    const overlay = document.getElementById('loadGameOverlay');
+    overlay.classList.remove('show');
+}
+
+function populateSavedGames() {
+    const savedGames = Object.keys(localStorage)
+        .filter(key => key.startsWith('gameState_'))
+        .map(key => ({
+            id: key,
+            name: key.replace('gameState_', '')
+        }));
+    const select = document.getElementById('savedGameSelect');
+    select.innerHTML = '';
+    savedGames.forEach(game => {
+        const option = document.createElement('option');
+        option.value = game.id;
+        option.textContent = game.name;
+        select.appendChild(option);
+    });
+}
+
 function loadSavedGame() {
     const select = document.getElementById('savedGameSelect');
-    const selectedGameId = select.value;
-    // Here you would load the game state based on the selectedGameId
-    console.log(`Loading game with ID: ${selectedGameId}`);
+    const selectedGameKey = select.value;
+    const gameState = localStorage.getItem(selectedGameKey);
+    if (gameState) {
+        sessionStorage.setItem('loadedGameState', gameState);
+        const { pageType } = JSON.parse(gameState);
+        location.href = `${pageType}.html`;
+    } else {
+        alert('Failed to load the selected game.');
+    }
     hideLoadGameOverlay();
 }
+
 
 // Show the high scores overlay
 function showHighScoresOverlay() {
