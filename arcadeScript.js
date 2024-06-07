@@ -291,23 +291,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return score;
     }
-
     function scoreRoad(row, col) {
-        const rowCells = grid[row];
+        const neighbors = getNeighbors(row, col);
         let score = 0;
-        let consecutiveRoads = 0;
-        for (let c = 0; c < gridSize; c++) {
-            if (rowCells[c] === 'road') {
-                consecutiveRoads++;
-                if (consecutiveRoads > 1) {
-                    score++;
-                }
-            } else {
-                consecutiveRoads = 0;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'road') {
+                score += 1;
             }
         }
         return score;
     }
+
+    // function scoreRoad(row, col) {
+    //     const rowCells = grid[row];
+    //     let score = 0;
+    //     let consecutiveRoads = 0;
+    //     for (let c = 0; c < gridSize; c++) {
+    //         if (rowCells[c] === 'road') {
+    //             consecutiveRoads++;
+    //             if (consecutiveRoads > 1) {
+    //                 score++;
+    //             }
+    //         } else {
+    //             consecutiveRoads = 0;
+    //         }
+    //     }
+    //     return score;
+    // }
 
     // Get neighboring cells
     function getNeighbors(row, col) {
