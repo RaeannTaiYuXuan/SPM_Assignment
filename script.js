@@ -42,8 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         road: 0
     };
 
-    let shiftPressed = false;
-    let selectedCells = [];
     let grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
 
     function createGrid(size) {
@@ -105,100 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleCellClick(cell, index, event) {
         if (demolitionMode) {
-            handleDemolition(cell);
-        } else if (isOccupied(cell)) {
-            if (shiftPressed) {
-                handleShiftClick(cell, index);
-            } else if (selectedCells.length > 0 && selectedCells.includes(cell)) {
-                handleSelectedUpkeep();
-            } else {
-                handleUpkeep(cell);
-            }
-        } else {
+            handleDemolition(cell, index);
+        } else if (!isOccupied(cell)) {
             placeBuilding(cell, index);
-        }
-    }
-
-    function handleUpkeep(cell) {
-        const buildingType = Array.from(cell.classList).find(cls => cls !== 'cell');
-        const upkeepCost = upkeepCosts[buildingType];
-        if (upkeepCost && confirm(`This building requires ${upkeepCost} coins for upkeep. Do you want to proceed?`)) {
-            totalUpkeep += upkeepCost;
-            score -= upkeepCost;
-            updateDisplays();
-            alert('Upkeep successful!');
-        } else {
-            alert('Upkeep canceled.');
-        }
-    }
-
-    function handleShiftClick(cell, index) {
-        if (selectedCells.includes(cell)) {
-            cell.classList.remove('selected');
-            selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
-        } else {
-            if (selectedCells.length === 0) {
-                cell.classList.add('selected');
-                selectedCells.push(cell);
-            } else {
-                const lastSelectedCell = selectedCells[selectedCells.length - 1];
-                if (areCellsConnected(lastSelectedCell, cell)) {
-                    cell.classList.add('selected');
-                    selectedCells.push(cell);
-                } else {
-                    alert('Selected buildings for group upkeep must only either be connecting residential buildings or connecting roads.');
-                }
-            }
-        }
-    }
-
-    function areCellsConnected(cell1, cell2) {
-        const index1 = parseInt(cell1.dataset.index, 10);
-        const index2 = parseInt(cell2.dataset.index, 10);
-        const row1 = Math.floor(index1 / gridSize);
-        const col1 = index1 % gridSize;
-        const row2 = Math.floor(index2 / gridSize);
-        const col2 = index2 % gridSize;
-
-        const isConnected = Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1;
-        const sameType = cell1.classList.contains('residential') && cell2.classList.contains('residential') ||
-                         cell1.classList.contains('road') && cell2.classList.contains('road');
-
-        return isConnected && sameType;
-    }
-
-    function handleSelectedUpkeep() {
-        let totalUpkeepCost = 0;
-        let allResidential = true;
-        let allRoad = true;
-
-        selectedCells.forEach(cell => {
-            if (cell.classList.contains('residential')) {
-                allRoad = false;
-            } else if (cell.classList.contains('road')) {
-                allResidential = false;
-            } else {
-                allResidential = false;
-                allRoad = false;
-            }
-        });
-
-        if (allResidential || allRoad) {
-            totalUpkeepCost = 1;
-        } else {
-            alert('Only connected residential or road buildings can be selected for group upkeep.');
-            return;
-        }
-
-        if (totalUpkeepCost && confirm(`The selected buildings require ${totalUpkeepCost} coin for upkeep. Do you want to proceed?`)) {
-            totalUpkeep += totalUpkeepCost;
-            score -= totalUpkeepCost;
-            updateDisplays();
-            alert('Upkeep successful!');
-            selectedCells.forEach(cell => cell.classList.remove('selected'));
-            selectedCells = [];
-        } else {
-            alert('Upkeep canceled.');
         }
     }
 
@@ -221,8 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             currentBuilding = ''; // Reset the current building selection after placement
             hideOverlay();
-            turn++;
-            updateTurnDisplay();
+            processTurn();
         } else {
             alert('Select a building first.');
         }
@@ -418,15 +324,18 @@ document.addEventListener('DOMContentLoaded', () => {
         demolitionMode = true;
     }
 
-    function handleDemolition(cell) {
+    function handleDemolition(cell, index) {
         if (isOccupied(cell)) {
             if (confirm('Are you sure you want to demolish this building?')) {
+                const buildingType = Array.from(cell.classList).find(cls => cls !== 'cell');
                 cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
                 cell.innerHTML = '';
+                grid[Math.floor(index / gridSize)][index % gridSize] = null;
                 totalProfit += 1;
                 score += 1;
                 updateDisplays();
                 alert('Building demolished. You earned 1 coin.');
+                processTurn();  // Automatic upkeep after demolition
             }
         } else {
             alert('This cell is empty. Choose a cell with a building to demolish.');
@@ -435,6 +344,66 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     demolishButton.addEventListener('click', demolishBuilding);
+
+    function processTurn() {
+        // Automatically calculate upkeep costs
+        let upkeepCost = 0;
+        const visited = new Set();
+
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                const buildingType = grid[row][col];
+                const cellKey = `${row},${col}`;
+                if (buildingType && !visited.has(cellKey)) {
+                    if (buildingType === 'residential' || buildingType === 'road') {
+                        const connectedCells = getConnectedCells(row, col, buildingType);
+                        connectedCells.forEach(cell => visited.add(cell));
+                        upkeepCost += upkeepCosts[buildingType];
+                    } else {
+                        upkeepCost += upkeepCosts[buildingType];
+                    }
+                }
+            }
+        }
+
+        totalUpkeep += upkeepCost;
+        score -= upkeepCost;
+
+        // Update displays
+        updateDisplays();
+        
+        // Increment the turn
+        turn++;
+        updateTurnDisplay();
+    }
+
+    function getConnectedCells(row, col, buildingType) {
+        const directions = [
+            [-1, 0], [1, 0], [0, -1], [0, 1] // up, down, left, right
+        ];
+        const stack = [[row, col]];
+        const connectedCells = new Set([`${row},${col}`]);
+
+        while (stack.length) {
+            const [currentRow, currentCol] = stack.pop();
+            for (const [dx, dy] of directions) {
+                const newRow = currentRow + dx;
+                const newCol = currentCol + dy;
+                const cellKey = `${newRow},${newCol}`;
+                if (
+                    newRow >= 0 && newRow < gridSize &&
+                    newCol >= 0 && newCol < gridSize &&
+                    !connectedCells.has(cellKey) &&
+                    grid[newRow][newCol] === buildingType
+                ) {
+                    stack.push([newRow, newCol]);
+                    connectedCells.add(cellKey);
+                }
+            }
+        }
+
+        return connectedCells;
+    }
 
     function updateTurnDisplay() {
         turnDisplay.textContent = turn;
@@ -521,100 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
         createGrid(gridSize);
         updateDisplays();
         updateTurnDisplay();
-    });
-
-    function saveGame() {
-        const fileName = prompt("Enter a name for your save game:");
-        if (fileName === null || fileName.trim() === '') {
-            alert('Save cancelled or invalid name entered.');
-            return;
-        }
-
-        const existingGameNames = Object.keys(localStorage)
-        .filter(key => key.startsWith('gameState_'))
-        .map(key => key.replace('gameState_', ''));
-        if (existingGameNames.includes(fileName)) {
-            alert('A game with this name already exists. Please choose a different name.');
-            return;
-        }
-
-        const gameState = {
-            pageType: window.location.pathname.includes('ArcadeGame') ? 'ArcadeGame' : 'FreePlay',
-            gridSize: gridSize,
-            score: score,
-            turn: turn,
-            totalProfit: totalProfit,
-            totalUpkeep: totalUpkeep,
-            cells: Array.from(document.querySelectorAll('.cell')).map(cell => ({
-                classes: Array.from(cell.classList),
-                innerHTML: cell.innerHTML
-            }))
-        };
-        localStorage.setItem(`gameState_${fileName}`, JSON.stringify(gameState));
-        alert('Game Saved!');
-    }
-
-    function loadGameState() {
-        const gameState = sessionStorage.getItem('loadedGameState');
-        if (!gameState) return;
-
-        const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, cells: savedCells } = JSON.parse(gameState);
-
-        gridSize = savedGridSize;
-        score = savedScore;
-        turn = savedTurn;
-        totalProfit = savedProfit;
-        totalUpkeep = savedUpkeep;
-        createGrid(gridSize);
-
-        const cells = document.querySelectorAll('.cell');
-        savedCells.forEach((savedCell, index) => {
-            cells[index].className = 'cell';
-            savedCell.classes.forEach(cls => cells[index].classList.add(cls));
-            cells[index].innerHTML = savedCell.innerHTML;
-        });
-
-        updateDisplays();
-        updateTurnDisplay();
-        sessionStorage.removeItem('loadedGameState');
-    }
-
-    saveButton.addEventListener('click', saveGame);
-
-    function demolishBuilding() {
-        alert('Choose a cell with a building to demolish.');
-        demolitionMode = true;
-    }
-
-    function handleDemolition(cell) {
-        if (isOccupied(cell)) {
-            if (confirm('Are you sure you want to demolish this building?')) {
-                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
-                cell.innerHTML = '';
-                totalProfit += 1;
-                score += 1;
-                turn++;  // Increment the turn counter
-                updateDisplays();
-                alert('Building demolished. You earned 1 coin.');
-            }
-        } else {
-            alert('This cell is empty. Choose a cell with a building to demolish.');
-        }
-        demolitionMode = false;
-    }
-
-    demolishButton.addEventListener('click', demolishBuilding);
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Shift') {
-            shiftPressed = true;
-        }
-    });
-
-    document.addEventListener('keyup', (event) => {
-        if (event.key === 'Shift') {
-            shiftPressed = false;
-        }
     });
 
     updateDisplays();
