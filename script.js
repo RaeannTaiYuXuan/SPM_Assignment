@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Get references to the main elements in the DOM
     const cityGrid = document.getElementById('cityGrid');
     const resetButton = document.getElementById('resetButton');
     const saveButton = document.getElementById('saveButton');
@@ -14,12 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('overlay');
     const overlayCloseButton = document.getElementById('overlayCloseButton');
 
-    let gridSize = 5; // Initial grid size
-    let coins = 1000; // Initial coins
-    let currentBuilding = '';
-    let demolitionMode = false; // Flag to indicate if we are in demolition mode
+    const turnDisplay = document.getElementById('turnDisplay');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const profitDisplay = document.getElementById('profitDisplay');
+    const upkeepDisplay = document.getElementById('upkeepDisplay');
 
-    // Define the upkeep costs for each building type
+    let gridSize = 5;
+    let coins = 1000;
+    let currentBuilding = '';
+    let demolitionMode = false;
+    let turn = 1;
+    let score = 0;
+    let totalProfit = 0;
+    let totalUpkeep = 0;
+
     const upkeepCosts = {
         residential: 1,
         industry: 1,
@@ -28,18 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
         road: 1
     };
 
-    // Define the earning rates for each building type
     const earningRates = {
         residential: 1,
         industry: 2,
         commercial: 3,
-        park: 0, // Parks don't generate coins
-        road: 0 // Roads don't generate coins
+        park: 0,
+        road: 0
     };
 
-    // Create the initial grid
     function createGrid(size) {
-        cityGrid.innerHTML = ''; // Clear the existing grid
+        cityGrid.innerHTML = '';
         for (let i = 0; i < size * size; i++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
@@ -50,16 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
         cityGrid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
     }
 
-    createGrid(gridSize); // Create the initial 5x5 grid
+    createGrid(gridSize);
 
-    // Expand the grid by adding one row/column on each side
     function expandGrid() {
-        const oldCells = [...document.querySelectorAll('.cell')]; // Save the current cells
-        gridSize += 2; // Increase the grid size by 2 which is 1 row/column on each side
-        createGrid(gridSize); // Create the new expanded grid
-        const newCells = document.querySelectorAll('.cell'); // Get the new cells
+        const oldCells = [...document.querySelectorAll('.cell')];
+        gridSize += 2;
+        createGrid(gridSize);
+        const newCells = document.querySelectorAll('.cell');
 
-        // Copy old cells back to the new grid
         for (let i = 0; i < gridSize - 2; i++) {
             for (let j = 0; j < gridSize - 2; j++) {
                 const oldIndex = i * (gridSize - 2) + j;
@@ -70,14 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Check if a cell is on the border of the grid
     function isBorderCell(index, size) {
         const row = Math.floor(index / size);
         const col = index % size;
         return row === 0 || row === size - 1 || col === 0 || col === size - 1;
     }
 
-    // Check if all border cells are filled with buildings
     function allBordersFilled(size) {
         for (let i = 0; i < size; i++) {
             if (!isOccupied(document.querySelector(`.cell[data-index="${i}"]`)) ||
@@ -90,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    // Check if a cell is occupied by a building
     function isOccupied(cell) {
         return cell.classList.contains('residential') ||
                cell.classList.contains('industry') ||
@@ -99,92 +99,75 @@ document.addEventListener('DOMContentLoaded', () => {
                cell.classList.contains('road');
     }
 
-    // Handle cell click for both placing and demolishing buildings
     function handleCellClick(cell, index, event) {
         if (demolitionMode) {
             handleDemolition(cell);
+        } else if (isOccupied(cell)) {
+            handleUpkeep(cell);
         } else {
             placeBuilding(cell, index);
         }
     }
 
-    // Place a building and handle expansion if all border cells are filled
+    function handleUpkeep(cell) {
+        const buildingType = Array.from(cell.classList).find(cls => cls !== 'cell');
+        const upkeepCost = upkeepCosts[buildingType];
+        if (upkeepCost && confirm(`This building requires ${upkeepCost} coins for upkeep. Do you want to proceed?`)) {
+            totalUpkeep += upkeepCost;
+            coins -= upkeepCost;
+            updateDisplays();
+            alert('Upkeep successful!');
+        } else {
+            alert('Upkeep canceled.');
+        }
+    }
+
     function placeBuilding(cell, index) {
-        const buildingCost = 1; // Base construction cost for any building
+        const buildingCost = 1;
         if (coins >= buildingCost) {
-            // Check if the cell is occupied by a building
-            if (isOccupied(cell)) {
-                const buildingType = Array.from(cell.classList).find(cls => cls !== 'cell'); // Get the building type from the cell's class
-                console.log("Building type:", buildingType); // Debug statement
+            if (currentBuilding) {
+                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+                cell.classList.add(currentBuilding);
+                updateCellIcon(cell, currentBuilding);
 
-                const upkeepCost = upkeepCosts[buildingType]; // Get the upkeep cost
-                console.log("Upkeep cost:", upkeepCost); // Debug statement
+                coins -= buildingCost;
+                const earning = calculateCoinEarnings(currentBuilding);
+                totalProfit += earning;
+                
+                coins += earning;
 
-                if (typeof upkeepCost !== 'undefined') {
-                    if (confirm(`This building requires ${upkeepCost} coins for upkeep. Do you want to proceed?`)) {
-                        // Deduct upkeep cost from coins
-                        coins -= upkeepCost;
+                updateDisplays();
 
-                        if (coins >= 0) {
-                            console.log(`Building successfully maintained. ${upkeepCost} coins deducted. Current coins: ${coins}`);
-                        } else {
-                            // If coins are insufficient after upkeep, refund the deducted coins and alert the user
-                            coins += upkeepCost;
-                            alert("Insufficient coins for upkeep!");
-                            updateCoinsDisplay(); // Update coins display after refund
-                            return;
-                        }
-
-                        updateCoinsDisplay(); // Update coins display after upkeep deduction
-                    } else {
-                        // User canceled upkeep, return without deducting coins
-                        console.log('Upkeep canceled by user.');
-                        return;
-                    }
-                } else {
-                    // Upkeep cost is not defined for the building type
-                    alert('Upkeep cost is not defined for this building type.');
-                    return;
+                if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
+                    expandGrid();
                 }
+                currentBuilding = '';
+                hideOverlay();
+                turn++;
+                updateTurnDisplay();
             } else {
-                // Cell doesn't contain a building, proceed with construction
-                if (currentBuilding) {
-                    cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
-                    cell.classList.add(currentBuilding);
-                    updateCellIcon(cell, currentBuilding);
-
-                    // Deduct construction cost from coins
-                    coins -= buildingCost;
-                    console.log(`Construction successful. ${buildingCost} coins deducted. Current coins: ${coins}`);
-
-                    // Calculate earnings if the building type generates coins
-                    const earning = calculateCoinEarnings(currentBuilding);
-                    coins += earning; // Add earnings to coins
-                    console.log(`Earnings from building: ${earning}. Current coins: ${coins}`);
-
-                    // Update coins display
-                    updateCoinsDisplay();
-
-                    if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
-                        expandGrid();
-                    }
-                    currentBuilding = '';
-                    hideOverlay();
-                } else {
-                    alert('Select a building first.');
-                }
+                alert('Select a building first.');
             }
         } else {
             alert('Insufficient coins to construct the building.');
         }
     }
 
-    // Calculate coin earnings based on building type
     function calculateCoinEarnings(buildingType) {
         return earningRates[buildingType];
     }
 
-    // Initialize event listeners for building buttons
+    function updateDisplays() {
+        profitDisplay.textContent = totalProfit;
+        upkeepDisplay.textContent = totalUpkeep;
+        scoreDisplay.textContent = coins;
+        updateCoinsDisplay();
+    }
+
+    function updateTurnDisplay() {
+        turnDisplay.textContent = turn;
+    }
+
     buildingButtons.residential.addEventListener('click', () => {
         currentBuilding = 'residential';
         showOverlay();
@@ -214,15 +197,17 @@ document.addEventListener('DOMContentLoaded', () => {
         hideOverlay();
     });
 
-    // Reset grid and coins
     resetButton.addEventListener('click', () => {
         coins = 1000;
         gridSize = 5;
+        turn = 1;
+        totalProfit = 0;
+        totalUpkeep = 0;
         createGrid(gridSize);
-        updateCoinsDisplay();
+        updateDisplays();
+        updateTurnDisplay();
     });
 
-    // Function to save the current game state
     function saveGame() {
         const fileName = prompt("Enter a name for your save game:");
         if (fileName === null || fileName.trim() === '') {
@@ -230,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Check if the game name already exists in localStorage
         const existingGameNames = Object.keys(localStorage)
         .filter(key => key.startsWith('gameState_'))
         .map(key => key.replace('gameState_', ''));
@@ -243,6 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
             pageType: window.location.pathname.includes('ArcadeGame') ? 'ArcadeGame' : 'FreePlay',
             gridSize: gridSize,
             coins: coins,
+            turn: turn,
+            totalProfit: totalProfit,
+            totalUpkeep: totalUpkeep,
             cells: Array.from(document.querySelectorAll('.cell')).map(cell => ({
                 classes: Array.from(cell.classList),
                 innerHTML: cell.innerHTML
@@ -252,64 +239,60 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Game Saved!');
     }
 
-    // Function to load the saved game state from sessionStorage
     function loadGameState() {
         const gameState = sessionStorage.getItem('loadedGameState');
         if (!gameState) return;
 
-        const { gridSize: savedGridSize, coins: savedCoins, cells: savedCells } = JSON.parse(gameState);
+        const { gridSize: savedGridSize, coins: savedCoins, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, cells: savedCells } = JSON.parse(gameState);
 
         gridSize = savedGridSize;
         coins = savedCoins;
-        createGrid(gridSize); // Create the grid with the saved size
+        turn = savedTurn;
+        totalProfit = savedProfit;
+        totalUpkeep = savedUpkeep;
+        createGrid(gridSize);
 
-        // Restore the cells
         const cells = document.querySelectorAll('.cell');
         savedCells.forEach((savedCell, index) => {
-            cells[index].className = 'cell'; // Reset the class list
+            cells[index].className = 'cell';
             savedCell.classes.forEach(cls => cells[index].classList.add(cls));
             cells[index].innerHTML = savedCell.innerHTML;
         });
 
-        updateCoinsDisplay(); // Update the coins display
-        sessionStorage.removeItem('loadedGameState'); // Clear the sessionStorage after loading
+        updateDisplays();
+        updateTurnDisplay();
+        sessionStorage.removeItem('loadedGameState');
     }
 
-
-
-    // Attach the save button event listener
     saveButton.addEventListener('click', saveGame);
 
-    // Function to handle demolishing a building
     function demolishBuilding() {
         alert('Choose a cell with a building to demolish.');
-        demolitionMode = true; // Set demolition mode to true
+        demolitionMode = true;
     }
 
     function handleDemolition(cell) {
         if (isOccupied(cell)) {
             if (confirm('Are you sure you want to demolish this building?')) {
                 cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
-                cell.innerHTML = ''; // Remove any icons or inner content
-                coins += 1; // Award 1 coin for demolishing the building
-                updateCoinsDisplay();
+                cell.innerHTML = '';
+                totalProfit += 1;
+                coins += 1;
+                updateDisplays();
                 alert('Building demolished. You earned 1 coin.');
             }
         } else {
             alert('This cell is empty. Choose a cell with a building to demolish.');
         }
-        demolitionMode = false; // Reset demolition mode
+        demolitionMode = false;
     }
 
-    // Initialize event listener for the demolish button
     demolishButton.addEventListener('click', demolishBuilding);
 
-    // Update the coin display
     function updateCoinsDisplay() {
-        document.querySelector('.left-content').textContent = `$${coins}`;
+        scoreDisplay.textContent = coins;
     }
 
-    // Show and hide overlay functions
     function showOverlay() {
         overlay.classList.add('show');
     }
@@ -318,7 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.classList.remove('show');
     }
 
-    // Update cell icon function
     function updateCellIcon(cell, buildingType) {
         let icon;
         switch (buildingType) {
@@ -353,10 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return icon;
     }
 
-    // Initial setup
-    updateCoinsDisplay();
+    updateDisplays();
     createGrid(gridSize);
-
-    // Call the loadGameState function if there's a saved game state
     loadGameState();
 });
