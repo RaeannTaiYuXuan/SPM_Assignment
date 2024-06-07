@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const upkeepDisplay = document.getElementById('upkeepDisplay');
 
     let gridSize = 5;
-    let coins = 1000;
     let currentBuilding = '';
     let demolitionMode = false;
     let turn = 1;
@@ -45,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let shiftPressed = false;
     let selectedCells = [];
+    let grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
 
     function createGrid(size) {
         cityGrid.innerHTML = '';
@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newIndex = (i + 1) * gridSize + (j + 1);
                 newCells[newIndex].classList = oldCells[oldIndex].classList;
                 newCells[newIndex].innerHTML = oldCells[oldIndex].innerHTML;
+                grid[Math.floor(newIndex / gridSize)][newIndex % gridSize] = grid[Math.floor(oldIndex / (gridSize - 2))][oldIndex % (gridSize - 2)];
             }
         }
     }
@@ -123,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const upkeepCost = upkeepCosts[buildingType];
         if (upkeepCost && confirm(`This building requires ${upkeepCost} coins for upkeep. Do you want to proceed?`)) {
             totalUpkeep += upkeepCost;
-            coins -= upkeepCost;
+            score -= upkeepCost;
             updateDisplays();
             alert('Upkeep successful!');
         } else {
@@ -191,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (totalUpkeepCost && confirm(`The selected buildings require ${totalUpkeepCost} coin for upkeep. Do you want to proceed?`)) {
             totalUpkeep += totalUpkeepCost;
-            coins -= totalUpkeepCost;
+            score -= totalUpkeepCost;
             updateDisplays();
             alert('Upkeep successful!');
             selectedCells.forEach(cell => cell.classList.remove('selected'));
@@ -203,32 +204,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function placeBuilding(cell, index) {
         const buildingCost = 1;
-        if (coins >= buildingCost) {
-            if (currentBuilding) {
-                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
-                cell.classList.add(currentBuilding);
-                updateCellIcon(cell, currentBuilding);
+        if (currentBuilding) {
+            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+            cell.classList.add(currentBuilding);
+            updateCellIcon(cell, currentBuilding);
 
-                coins -= buildingCost;
-                const earning = calculateCoinEarnings(currentBuilding);
-                totalProfit += earning;
-                
-                coins += earning;
+            grid[Math.floor(index / gridSize)][index % gridSize] = currentBuilding;
 
-                updateDisplays();
+            const earning = calculateCoinEarnings(currentBuilding);
+            totalProfit += earning;
+            score += earning - buildingCost;
+            updateDisplays();
 
-                if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
-                    expandGrid();
-                }
-                currentBuilding = '';
-                hideOverlay();
-                turn++;
-                updateTurnDisplay();
-            } else {
-                alert('Select a building first.');
+            if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
+                expandGrid();
             }
+            currentBuilding = ''; // Reset the current building selection after placement
+            hideOverlay();
+            turn++;
+            updateTurnDisplay();
         } else {
-            alert('Insufficient coins to construct the building.');
+            alert('Select a building first.');
         }
     }
 
@@ -239,53 +235,125 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateDisplays() {
         profitDisplay.textContent = totalProfit;
         upkeepDisplay.textContent = totalUpkeep;
-        scoreDisplay.textContent = coins;
-        updateCoinsDisplay();
+        scoreDisplay.textContent = calculateScore();  // Update the score display
+        updateTurnDisplay();
     }
 
     function updateTurnDisplay() {
         turnDisplay.textContent = turn;
     }
 
-    buildingButtons.residential.addEventListener('click', () => {
-        currentBuilding = 'residential';
-        showOverlay();
-    });
+    // Calculate scores for different building types
+    function calculateScore() {
+        let score = 0;
+        let industryCount = 0;
 
-    buildingButtons.industry.addEventListener('click', () => {
-        currentBuilding = 'industry';
-        showOverlay();
-    });
+        // Calculate score for each type of building
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                if (grid[row][col] !== null) {
+                    switch (grid[row][col]) {
+                        case 'residential':
+                            score += scoreResidential(row, col);
+                            break;
+                        case 'industry':
+                            industryCount++;
+                            break;
+                        case 'commercial':
+                            score += scoreCommercial(row, col);
+                            break;
+                        case 'park':
+                            score += scorePark(row, col);
+                            break;
+                        case 'road':
+                            score += scoreRoad(row, col);
+                            break;
+                    }
+                }
+            }
+        }
+        score += industryCount; // Add the total industry count to the score once
+        return score;
+    }
 
-    buildingButtons.commercial.addEventListener('click', () => {
-        currentBuilding = 'commercial';
-        showOverlay();
-    });
+    // Helper functions to calculate scores for each type of building
+    function scoreResidential(row, col) {
+        const neighbors = getNeighbors(row, col);
+        let score = 0;
+        let nextToIndustry = false;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'industry') {
+                nextToIndustry = true;
+                break;
+            }
+        }
+        if (nextToIndustry) {
+            return 1;
+        }
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'residential' || grid[neighbor[0]][neighbor[1]] === 'commercial') {
+                score += 1;
+            } else if (grid[neighbor[0]][neighbor[1]] === 'park') {
+                score += 2;
+            }
+        }
+        return score;
+    }
 
-    buildingButtons.park.addEventListener('click', () => {
-        currentBuilding = 'park';
-        showOverlay();
-    });
+    function scoreIndustry(row, col) {
+        let industryCount = 0;
+        for (let r = 0; r < gridSize; r++) {
+            for (let c = 0; c < gridSize; c++) {
+                if (grid[r][c] === 'industry') {
+                    industryCount++;
+                }
+            }
+        }
+        return industryCount; // Each industry scores based on the total number of industries in the city
+    }
 
-    buildingButtons.road.addEventListener('click', () => {
-        currentBuilding = 'road';
-        showOverlay();
-    });
+    function scoreCommercial(row, col) {
+        const neighbors = getNeighbors(row, col);
+        let score = 0;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'commercial') {
+                score += 1;
+            }
+        }
+        return score;
+    }
 
-    overlayCloseButton.addEventListener('click', () => {
-        hideOverlay();
-    });
+    function scorePark(row, col) {
+        const neighbors = getNeighbors(row, col);
+        let score = 0;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'park') {
+                score += 1;
+            }
+        }
+        return score;
+    }
 
-    resetButton.addEventListener('click', () => {
-        coins = 1000;
-        gridSize = 5;
-        turn = 1;
-        totalProfit = 0;
-        totalUpkeep = 0;
-        createGrid(gridSize);
-        updateDisplays();
-        updateTurnDisplay();
-    });
+    function scoreRoad(row, col) {
+        const neighbors = getNeighbors(row, col);
+        let score = 0;
+        for (let neighbor of neighbors) {
+            if (grid[neighbor[0]][neighbor[1]] === 'road') {
+                score += 1;
+            }
+        }
+        return score;
+    }
+
+    // Get neighboring cells
+    function getNeighbors(row, col) {
+        const directions = [
+            [-1, 0], [1, 0], [0, -1], [0, 1] // up, down, left, right
+        ];
+        return directions
+            .map(([dx, dy]) => [row + dx, col + dy])
+            .filter(([r, c]) => r >= 0 && r < gridSize && c >= 0 && c < gridSize);
+    }
 
     function saveGame() {
         const fileName = prompt("Enter a name for your save game:");
@@ -305,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const gameState = {
             pageType: window.location.pathname.includes('ArcadeGame') ? 'ArcadeGame' : 'FreePlay',
             gridSize: gridSize,
-            coins: coins,
+            score: score,
             turn: turn,
             totalProfit: totalProfit,
             totalUpkeep: totalUpkeep,
@@ -322,10 +390,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const gameState = sessionStorage.getItem('loadedGameState');
         if (!gameState) return;
 
-        const { gridSize: savedGridSize, coins: savedCoins, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, cells: savedCells } = JSON.parse(gameState);
+        const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, cells: savedCells } = JSON.parse(gameState);
 
         gridSize = savedGridSize;
-        coins = savedCoins;
+        score = savedScore;
         turn = savedTurn;
         totalProfit = savedProfit;
         totalUpkeep = savedUpkeep;
@@ -356,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
                 cell.innerHTML = '';
                 totalProfit += 1;
-                coins += 1;
+                score += 1;
                 updateDisplays();
                 alert('Building demolished. You earned 1 coin.');
             }
@@ -368,8 +436,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     demolishButton.addEventListener('click', demolishBuilding);
 
-    function updateCoinsDisplay() {
-        scoreDisplay.textContent = coins;
+    function updateTurnDisplay() {
+        turnDisplay.textContent = turn;
     }
 
     function showOverlay() {
@@ -413,6 +481,129 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.style.height = '40px';
         return icon;
     }
+
+    buildingButtons.residential.addEventListener('click', () => {
+        currentBuilding = 'residential';
+        showOverlay();
+    });
+
+    buildingButtons.industry.addEventListener('click', () => {
+        currentBuilding = 'industry';
+        showOverlay();
+    });
+
+    buildingButtons.commercial.addEventListener('click', () => {
+        currentBuilding = 'commercial';
+        showOverlay();
+    });
+
+    buildingButtons.park.addEventListener('click', () => {
+        currentBuilding = 'park';
+        showOverlay();
+    });
+
+    buildingButtons.road.addEventListener('click', () => {
+        currentBuilding = 'road';
+        showOverlay();
+    });
+
+    overlayCloseButton.addEventListener('click', () => {
+        hideOverlay();
+    });
+
+    resetButton.addEventListener('click', () => {
+        gridSize = 5;
+        turn = 1;
+        totalProfit = 0;
+        totalUpkeep = 0;
+        score = 0;
+        grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
+        createGrid(gridSize);
+        updateDisplays();
+        updateTurnDisplay();
+    });
+
+    function saveGame() {
+        const fileName = prompt("Enter a name for your save game:");
+        if (fileName === null || fileName.trim() === '') {
+            alert('Save cancelled or invalid name entered.');
+            return;
+        }
+
+        const existingGameNames = Object.keys(localStorage)
+        .filter(key => key.startsWith('gameState_'))
+        .map(key => key.replace('gameState_', ''));
+        if (existingGameNames.includes(fileName)) {
+            alert('A game with this name already exists. Please choose a different name.');
+            return;
+        }
+
+        const gameState = {
+            pageType: window.location.pathname.includes('ArcadeGame') ? 'ArcadeGame' : 'FreePlay',
+            gridSize: gridSize,
+            score: score,
+            turn: turn,
+            totalProfit: totalProfit,
+            totalUpkeep: totalUpkeep,
+            cells: Array.from(document.querySelectorAll('.cell')).map(cell => ({
+                classes: Array.from(cell.classList),
+                innerHTML: cell.innerHTML
+            }))
+        };
+        localStorage.setItem(`gameState_${fileName}`, JSON.stringify(gameState));
+        alert('Game Saved!');
+    }
+
+    function loadGameState() {
+        const gameState = sessionStorage.getItem('loadedGameState');
+        if (!gameState) return;
+
+        const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, cells: savedCells } = JSON.parse(gameState);
+
+        gridSize = savedGridSize;
+        score = savedScore;
+        turn = savedTurn;
+        totalProfit = savedProfit;
+        totalUpkeep = savedUpkeep;
+        createGrid(gridSize);
+
+        const cells = document.querySelectorAll('.cell');
+        savedCells.forEach((savedCell, index) => {
+            cells[index].className = 'cell';
+            savedCell.classes.forEach(cls => cells[index].classList.add(cls));
+            cells[index].innerHTML = savedCell.innerHTML;
+        });
+
+        updateDisplays();
+        updateTurnDisplay();
+        sessionStorage.removeItem('loadedGameState');
+    }
+
+    saveButton.addEventListener('click', saveGame);
+
+    function demolishBuilding() {
+        alert('Choose a cell with a building to demolish.');
+        demolitionMode = true;
+    }
+
+    function handleDemolition(cell) {
+        if (isOccupied(cell)) {
+            if (confirm('Are you sure you want to demolish this building?')) {
+                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+                cell.innerHTML = '';
+                totalProfit += 1;
+                score += 1;
+                turn++;  // Increment the turn counter
+                updateDisplays();
+                alert('Building demolished. You earned 1 coin.');
+            }
+        } else {
+            alert('This cell is empty. Choose a cell with a building to demolish.');
+        }
+        demolitionMode = false;
+    }
+
+    demolishButton.addEventListener('click', demolishBuilding);
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Shift') {
