@@ -224,6 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to save the current game state
     function saveGame() {
+        const fileName = prompt("Enter a name for your save game:");
+        if (fileName === null || fileName.trim() === '') {
+            alert('Save cancelled or invalid name entered.');
+            return;
+        }
         const gameState = {
             gridSize: gridSize,
             coins: coins,
@@ -232,9 +237,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 innerHTML: cell.innerHTML
             }))
         };
-        localStorage.setItem('freePlayGameState', JSON.stringify(gameState));
+        localStorage.setItem(`freePlayGameState_${fileName}`, JSON.stringify(gameState));
         alert('Game Saved!');
+    }        
+
+    // Function to load the saved game state from sessionStorage
+    function loadGameState() {
+        const gameState = sessionStorage.getItem('loadedGameState');
+        if (!gameState) return;
+
+        const { gridSize: savedGridSize, coins: savedCoins, cells: savedCells } = JSON.parse(gameState);
+
+        gridSize = savedGridSize;
+        coins = savedCoins;
+        createGrid(gridSize); // Create the grid with the saved size
+
+        // Restore the cells
+        const cells = document.querySelectorAll('.cell');
+        savedCells.forEach((savedCell, index) => {
+            cells[index].className = 'cell'; // Reset the class list
+            savedCell.classes.forEach(cls => cells[index].classList.add(cls));
+            cells[index].innerHTML = savedCell.innerHTML;
+        });
+
+        updateCoinsDisplay(); // Update the coins display
+        sessionStorage.removeItem('loadedGameState'); // Clear the sessionStorage after loading
     }
+
+    // Call the loadGameState function if there's a saved game state
+    loadGameState();
 
     // Attach the save button event listener
     saveButton.addEventListener('click', saveGame);
