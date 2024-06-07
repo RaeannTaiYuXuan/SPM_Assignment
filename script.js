@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
         park: document.getElementById('parkButton'),
         road: document.getElementById('roadButton')
     };
-    const overlay = document.getElementById('overlay');
-    const overlayCloseButton = document.getElementById('overlayCloseButton');
 
     const turnDisplay = document.getElementById('turnDisplay');
     const scoreDisplay = document.getElementById('scoreDisplay');
@@ -127,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 expandGrid();
             }
             currentBuilding = ''; // Reset the current building selection after placement
-            hideOverlay();
             processTurn();
         } else {
             alert('Select a building first.');
@@ -409,14 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
         turnDisplay.textContent = turn;
     }
 
-    function showOverlay() {
-        overlay.classList.add('show');
-    }
-
-    function hideOverlay() {
-        overlay.classList.remove('show');
-    }
-
     function updateCellIcon(cell, buildingType) {
         let icon;
         switch (buildingType) {
@@ -453,31 +442,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     buildingButtons.residential.addEventListener('click', () => {
         currentBuilding = 'residential';
-        showOverlay();
     });
 
     buildingButtons.industry.addEventListener('click', () => {
         currentBuilding = 'industry';
-        showOverlay();
     });
 
     buildingButtons.commercial.addEventListener('click', () => {
         currentBuilding = 'commercial';
-        showOverlay();
     });
 
     buildingButtons.park.addEventListener('click', () => {
         currentBuilding = 'park';
-        showOverlay();
     });
 
     buildingButtons.road.addEventListener('click', () => {
         currentBuilding = 'road';
-        showOverlay();
-    });
-
-    overlayCloseButton.addEventListener('click', () => {
-        hideOverlay();
     });
 
     resetButton.addEventListener('click', () => {
