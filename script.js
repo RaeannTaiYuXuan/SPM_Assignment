@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
         road: 0
     };
 
+    let shiftPressed = false;
+    let selectedCells = [];
+
     function createGrid(size) {
         cityGrid.innerHTML = '';
         for (let i = 0; i < size * size; i++) {
@@ -103,7 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (demolitionMode) {
             handleDemolition(cell);
         } else if (isOccupied(cell)) {
-            handleUpkeep(cell);
+            if (shiftPressed) {
+                handleShiftClick(cell, index);
+            } else if (selectedCells.length > 0 && selectedCells.includes(cell)) {
+                handleSelectedUpkeep();
+            } else {
+                handleUpkeep(cell);
+            }
         } else {
             placeBuilding(cell, index);
         }
@@ -117,6 +126,76 @@ document.addEventListener('DOMContentLoaded', () => {
             coins -= upkeepCost;
             updateDisplays();
             alert('Upkeep successful!');
+        } else {
+            alert('Upkeep canceled.');
+        }
+    }
+
+    function handleShiftClick(cell, index) {
+        if (selectedCells.includes(cell)) {
+            cell.classList.remove('selected');
+            selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
+        } else {
+            if (selectedCells.length === 0) {
+                cell.classList.add('selected');
+                selectedCells.push(cell);
+            } else {
+                const lastSelectedCell = selectedCells[selectedCells.length - 1];
+                if (areCellsConnected(lastSelectedCell, cell)) {
+                    cell.classList.add('selected');
+                    selectedCells.push(cell);
+                } else {
+                    alert('Selected buildings for group upkeep must only either be connecting residential buildings or connecting roads.');
+                }
+            }
+        }
+    }
+
+    function areCellsConnected(cell1, cell2) {
+        const index1 = parseInt(cell1.dataset.index, 10);
+        const index2 = parseInt(cell2.dataset.index, 10);
+        const row1 = Math.floor(index1 / gridSize);
+        const col1 = index1 % gridSize;
+        const row2 = Math.floor(index2 / gridSize);
+        const col2 = index2 % gridSize;
+
+        const isConnected = Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1;
+        const sameType = cell1.classList.contains('residential') && cell2.classList.contains('residential') ||
+                         cell1.classList.contains('road') && cell2.classList.contains('road');
+
+        return isConnected && sameType;
+    }
+
+    function handleSelectedUpkeep() {
+        let totalUpkeepCost = 0;
+        let allResidential = true;
+        let allRoad = true;
+
+        selectedCells.forEach(cell => {
+            if (cell.classList.contains('residential')) {
+                allRoad = false;
+            } else if (cell.classList.contains('road')) {
+                allResidential = false;
+            } else {
+                allResidential = false;
+                allRoad = false;
+            }
+        });
+
+        if (allResidential || allRoad) {
+            totalUpkeepCost = 1;
+        } else {
+            alert('Only connected residential or road buildings can be selected for group upkeep.');
+            return;
+        }
+
+        if (totalUpkeepCost && confirm(`The selected buildings require ${totalUpkeepCost} coin for upkeep. Do you want to proceed?`)) {
+            totalUpkeep += totalUpkeepCost;
+            coins -= totalUpkeepCost;
+            updateDisplays();
+            alert('Upkeep successful!');
+            selectedCells.forEach(cell => cell.classList.remove('selected'));
+            selectedCells = [];
         } else {
             alert('Upkeep canceled.');
         }
@@ -334,6 +413,18 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.style.height = '40px';
         return icon;
     }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Shift') {
+            shiftPressed = true;
+        }
+    });
+
+    document.addEventListener('keyup', (event) => {
+        if (event.key === 'Shift') {
+            shiftPressed = false;
+        }
+    });
 
     updateDisplays();
     createGrid(gridSize);

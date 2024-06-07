@@ -104,6 +104,11 @@ body {
     background-color: rgba(153, 51, 255, 0.8); /* Neon purple */
 }
 
+.cell.selected {
+    border: 2px solid #FFFF00; /* Yellow border to indicate selection */
+}
+
+
 .toolbar {
     display: flex;
     flex-direction: column;
