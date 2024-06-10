@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cityGridArcade = document.getElementById('cityGridArcade');
     const resetButtonArcade = document.getElementById('resetButtonArcade');
     const saveButtonArcade = document.getElementById('saveButtonArcade');
+    const demolishButton = document.getElementById('demolishButton'); // Added demolish button
     const buildingButtons = {
         residential: document.getElementById('residentialButton'),
         industry: document.getElementById('industryButton'),
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let coins = 16; // Tracks the number of coins remaining
     const gridSize = 20; // Size of the grid (20x20)
     let grid = Array(gridSize).fill().map(() => Array(gridSize).fill(null)); // 2D array to keep track of grid state
+    let demolitionMode = false;
 
     // Create the 20x20 grid dynamically
     for (let i = 0; i < gridSize * gridSize; i++) {
@@ -26,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.classList.add('cell-arcade'); // Add a class for styling
         cell.dataset.row = Math.floor(i / gridSize); // Store row index in data attribute
         cell.dataset.col = i % gridSize; // Store column index in data attribute
-        cell.addEventListener('click', () => placeBuilding(cell)); // Add click event listener to place a building
+        cell.addEventListener('click', () => handleCellClick(cell, i)); // Add click event listener to handle cell click
         cityGridArcade.appendChild(cell); // Append the cell to the grid container
     }
 
@@ -106,12 +108,21 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Current Building Selected:', currentBuilding); // Log the current building
     }
 
+    // Handle cell click events
+    function handleCellClick(cell, index) {
+        if (demolitionMode) {
+            handleDemolition(cell, index);
+        } else {
+            placeBuilding(cell);
+        }
+    }
+
     // Place the selected building on the grid
     function placeBuilding(cell) {
         const row = parseInt(cell.dataset.row); // Get the row index from the cell's data attribute
         const col = parseInt(cell.dataset.col); // Get the column index from the cell's data attribute
 
-        if (currentBuilding && (roundNo === 1 || isNextToExistingBuilding(row, col))) {
+        if (currentBuilding && (roundNo === 1 || isNextToExistingBuilding(row, col) || isDiagonalToExistingBuilding(row, col))) {
             cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road'); // Remove all building classes
             cell.classList.add(currentBuilding); // Add the current building class
             updateCellIcon(cell, currentBuilding); // Update the cell with the building icon
@@ -120,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentBuilding = ''; // Reset the current building selection after placement
             startNewRound(); // Start a new round
         } else if (roundNo !== 1) {
-            alert('You can only build next to existing buildings.'); // Alert the user if the placement is invalid
+            alert('You can only build next to existing buildings or diagonally.'); // Alert the user if the placement is invalid
         } else {
             alert('Select a building first.'); // Alert the user if no building is selected
         }
@@ -157,6 +168,21 @@ document.addEventListener('DOMContentLoaded', () => {
             [1, 0], // Down
             [0, -1], // Left
             [-1, 0] // Up
+        ];
+        return directions.some(([dx, dy]) => {
+            const newRow = row + dx;
+            const newCol = col + dy;
+            return newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol];
+        });
+    }
+
+    // Check if the cell is diagonally adjacent to an existing building
+    function isDiagonalToExistingBuilding(row, col) {
+        const directions = [
+            [-1, -1], // Top-left
+            [-1, 1], // Top-right
+            [1, -1], // Bottom-left
+            [1, 1] // Bottom-right
         ];
         return directions.some(([dx, dy]) => {
             const newRow = row + dx;
@@ -291,6 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return score;
     }
+
     function scoreRoad(row, col) {
         const neighbors = getNeighbors(row, col);
         let score = 0;
@@ -302,32 +329,44 @@ document.addEventListener('DOMContentLoaded', () => {
         return score;
     }
 
-    // function scoreRoad(row, col) {
-    //     const rowCells = grid[row];
-    //     let score = 0;
-    //     let consecutiveRoads = 0;
-    //     for (let c = 0; c < gridSize; c++) {
-    //         if (rowCells[c] === 'road') {
-    //             consecutiveRoads++;
-    //             if (consecutiveRoads > 1) {
-    //                 score++;
-    //             }
-    //         } else {
-    //             consecutiveRoads = 0;
-    //         }
-    //     }
-    //     return score;
-    // }
-
     // Get neighboring cells
     function getNeighbors(row, col) {
         const directions = [
-            [-1, 0], [1, 0], [0, -1], [0, 1] // up, down, left, right
+            [-1, 0], [1, 0], [0, -1], [0, 1], // up, down, left, right
+            [-1, -1], [-1, 1], [1, -1], [1, 1] // diagonals
         ];
         return directions
             .map(([dx, dy]) => [row + dx, col + dy])
             .filter(([r, c]) => r >= 0 && r < gridSize && c >= 0 && c < gridSize);
     }
+
+    // Enable demolition mode
+    function demolishBuilding() {
+        alert('Choose a cell with a building to demolish.');
+        demolitionMode = true;
+    }
+
+    // Handle demolition of a building
+    function handleDemolition(cell, index) {
+        if (isOccupied(cell)) {
+            if (confirm('Are you sure you want to demolish this building?')) {
+                const buildingType = Array.from(cell.classList).find(cls => cls !== 'cell-arcade');
+                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+                cell.innerHTML = '';
+                grid[Math.floor(index / gridSize)][index % gridSize] = null;
+                coins += 1; // Award 1 coin for demolition
+                coinsHTML.textContent = `${coins} coins`; // Update the coins value on the screen
+                alert('Building demolished. You earned 1 coin.');
+                updateScoreDisplay(); // Update the score display after demolition
+            }
+        } else {
+            alert('This cell is empty. Choose a cell with a building to demolish.');
+        }
+        demolitionMode = false;
+    }
+
+    // Attach the demolish button event listener
+    demolishButton.addEventListener('click', demolishBuilding);
 
     // Update the score display
     function updateScoreDisplay() {
@@ -337,4 +376,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startNewRound(); // Start the first round
 });
-

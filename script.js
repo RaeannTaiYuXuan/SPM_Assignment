@@ -109,26 +109,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function placeBuilding(cell, index) {
         const buildingCost = 1;
+        const row = Math.floor(index / gridSize);
+        const col = index % gridSize;
+
         if (currentBuilding) {
-            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
-            cell.classList.add(currentBuilding);
-            updateCellIcon(cell, currentBuilding);
+            if (turn === 1 || isNextToOrDiagonalToExistingBuilding(row, col)) {
+                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+                cell.classList.add(currentBuilding);
+                updateCellIcon(cell, currentBuilding);
 
-            grid[Math.floor(index / gridSize)][index % gridSize] = currentBuilding;
+                grid[row][col] = currentBuilding;
 
-            const earning = calculateCoinEarnings(currentBuilding);
-            totalProfit += earning;
-            score += earning - buildingCost;
-            updateDisplays();
+                const earning = calculateCoinEarnings(currentBuilding);
+                totalProfit += earning;
+                score += earning - buildingCost;
+                updateDisplays();
 
-            if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
-                expandGrid();
+                if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
+                    expandGrid();
+                }
+                currentBuilding = ''; // Reset the current building selection after placement
+                processTurn();
+            } else {
+                alert('You can only build next to or diagonally to existing buildings.');
             }
-            currentBuilding = ''; // Reset the current building selection after placement
-            processTurn();
         } else {
             alert('Select a building first.');
         }
+    }
+
+    function isNextToOrDiagonalToExistingBuilding(row, col) {
+        const directions = [
+            [0, 1], [1, 0], [0, -1], [-1, 0], // adjacent cells
+            [-1, -1], [-1, 1], [1, -1], [1, 1] // diagonal cells
+        ];
+        return directions.some(([dx, dy]) => {
+            const newRow = row + dx;
+            const newCol = col + dy;
+            return newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol];
+        });
     }
 
     function calculateCoinEarnings(buildingType) {
@@ -251,7 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get neighboring cells
     function getNeighbors(row, col) {
         const directions = [
-            [-1, 0], [1, 0], [0, -1], [0, 1] // up, down, left, right
+            [-1, 0], [1, 0], [0, -1], [0, 1], // up, down, left, right
+            [-1, -1], [-1, 1], [1, -1], [1, 1] // diagonals
         ];
         return directions
             .map(([dx, dy]) => [row + dx, col + dy])
