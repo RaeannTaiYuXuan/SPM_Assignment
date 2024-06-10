@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.classList.add('cell-arcade'); // Add a class for styling
         cell.dataset.row = Math.floor(i / gridSize); // Store row index in data attribute
         cell.dataset.col = i % gridSize; // Store column index in data attribute
-        cell.addEventListener('click', (event) => handleCellClick(cell, i,event)); // Add click event listener to handle cell click
+        cell.addEventListener('click', (event) => handleCellClick(cell, i, event)); // Add click event listener to handle cell click
         cityGridArcade.appendChild(cell); // Append the cell to the grid container
     }
 
@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to start a new round
     function startNewRound() {
+        generateCoinsForAllBuildings(); // Generate coins based on existing buildings
         coinsHTML.textContent = `${coins} coins`; // Update the coins value on the screen 
         if (coins > 0) { // Check if there are coins left
             roundNo++; // Increment the round number
@@ -133,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             cell.classList.add(currentBuilding); // Add the current building class
             updateCellIcon(cell, currentBuilding); // Update the cell with the building icon
             grid[row][col] = currentBuilding; // Update the grid state
-            regenerateCoins(row, col, currentBuilding); // Regenerate coins based on the new building
             currentBuilding = ''; // Reset the current building selection after placement
             startNewRound(); // Start a new round
         } else if (roundNo !== 1) {
@@ -144,18 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
         updateScoreDisplay(); // Update the score display after placing a building
     }
 
-    // Regenerate coins based on building placement
-    function regenerateCoins(row, col, building) {
+    // Generate coins based on existing buildings each round
+    function generateCoinsForAllBuildings() {
         let additionalCoins = 0;
-        switch (building) {
-            case 'industry':
-                additionalCoins = countAdjacentBuildings(row, col, 'residential');
-                break;
-            case 'commercial':
-                additionalCoins = countAdjacentBuildings(row, col, 'residential');
-                break;
-            default:
-                break;
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                if (grid[row][col] === 'industry') {
+                    additionalCoins += countAdjacentBuildings(row, col, 'residential');
+                }
+                if (grid[row][col] === 'commercial') {
+                    additionalCoins += countAdjacentBuildings(row, col, 'residential');
+                }
+            }
         }
         coins += additionalCoins;
         coinsHTML.textContent = `${coins} coins`; // Update the coins value on the screen
