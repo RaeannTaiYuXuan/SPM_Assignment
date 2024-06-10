@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.classList.add('cell-arcade'); // Add a class for styling
         cell.dataset.row = Math.floor(i / gridSize); // Store row index in data attribute
         cell.dataset.col = i % gridSize; // Store column index in data attribute
-        cell.addEventListener('click', () => handleCellClick(cell, i)); // Add click event listener to handle cell click
+        cell.addEventListener('click', (event) => handleCellClick(cell, i,event)); // Add click event listener to handle cell click
         cityGridArcade.appendChild(cell); // Append the cell to the grid container
     }
 
@@ -100,6 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+    function isOccupied(cell) {
+        return cell.classList.contains('residential') ||
+                cell.classList.contains('industry') ||
+                cell.classList.contains('commercial') ||
+                cell.classList.contains('park') ||
+                cell.classList.contains('road');
+    }
 
     // Handle the building button click event
     function handleBuildingClick(event) {
@@ -108,12 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Current Building Selected:', currentBuilding); // Log the current building
     }
 
-    // Handle cell click events
-    function handleCellClick(cell, index) {
+    function handleCellClick(cell, index, event) {
         if (demolitionMode) {
             handleDemolition(cell, index);
         } else {
-            placeBuilding(cell);
+            placeBuilding(cell, index);
         }
     }
 
