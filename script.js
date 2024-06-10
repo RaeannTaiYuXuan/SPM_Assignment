@@ -272,8 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const existingGameNames = Object.keys(localStorage)
-        .filter(key => key.startsWith('gameState_'))
-        .map(key => key.replace('gameState_', ''));
+            .filter(key => key.startsWith('gameState_'))
+            .map(key => key.replace('gameState_', ''));
         if (existingGameNames.includes(fileName)) {
             alert('A game with this name already exists. Please choose a different name.');
             return;
@@ -286,6 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
             turn: turn,
             totalProfit: totalProfit,
             totalUpkeep: totalUpkeep,
+            consecutiveLosingTurns: consecutiveLosingTurns,
+            previousProfit: previousProfit,
+            grid: grid,
             cells: Array.from(document.querySelectorAll('.cell')).map(cell => ({
                 classes: Array.from(cell.classList),
                 innerHTML: cell.innerHTML
@@ -299,13 +302,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const gameState = sessionStorage.getItem('loadedGameState');
         if (!gameState) return;
 
-        const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, cells: savedCells } = JSON.parse(gameState);
+        const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, consecutiveLosingTurns: savedConsecutiveLosingTurns, previousProfit: savedPreviousProfit, grid: savedGrid, cells: savedCells } = JSON.parse(gameState);
 
         gridSize = savedGridSize;
         score = savedScore;
         turn = savedTurn;
         totalProfit = savedProfit;
         totalUpkeep = savedUpkeep;
+        consecutiveLosingTurns = savedConsecutiveLosingTurns;
+        previousProfit = savedPreviousProfit;
+        grid = savedGrid;
         createGrid(gridSize);
 
         const cells = document.querySelectorAll('.cell');
@@ -379,21 +385,10 @@ document.addEventListener('DOMContentLoaded', () => {
             consecutiveLosingTurns = 0;
         }
         previousProfit = totalProfit; // Update previousProfit to current turn's profit
-        console.log("CONSECUTIVE LOSING TURNS: " + consecutiveLosingTurns);
 
         if (consecutiveLosingTurns >= 20) {
             alert('Game Over: The city has been making a loss for 20 consecutive turns.');
-            gridSize = 5;
-            turn = 1;
-            totalProfit = 0;
-            totalUpkeep = 0;
-            score = 0;
-            consecutiveLosingTurns = 0; // Reset consecutive losing turns counter
-            previousProfit = 0; // Reset previous profit
-            grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
-            createGrid(gridSize);
-            updateDisplays();
-            updateTurnDisplay();
+            resetGame();
         }
 
         // Update displays
@@ -401,6 +396,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Increment the turn
         turn++;
+        updateTurnDisplay();
+    }
+
+    function resetGame() {
+        gridSize = 5;
+        turn = 1;
+        totalProfit = 0;
+        totalUpkeep = 0;
+        score = 0;
+        consecutiveLosingTurns = 0; // Reset consecutive losing turns counter
+        previousProfit = 0; // Reset previous profit
+        grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
+        createGrid(gridSize);
+        updateDisplays();
         updateTurnDisplay();
     }
 
@@ -430,10 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return connectedCells;
-    }
-
-    function updateTurnDisplay() {
-        turnDisplay.textContent = turn;
     }
 
     function updateCellIcon(cell, buildingType) {

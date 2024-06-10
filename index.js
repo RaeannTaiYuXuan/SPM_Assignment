@@ -70,6 +70,11 @@ function loadSavedGame() {
     hideLoadGameOverlay();
 }
 
+// Event listeners for showing and hiding the load game overlay
+document.getElementById('loadGameButton').addEventListener('click', showLoadGameOverlay);
+document.getElementById('closeLoadGameOverlay').addEventListener('click', hideLoadGameOverlay);
+document.getElementById('loadGameConfirmButton').addEventListener('click', loadSavedGame);
+
 
 // Show the high scores overlay
 function showHighScoresOverlay() {
