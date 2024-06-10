@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let totalProfit = 0;
     let totalUpkeep = 0;
     let consecutiveLosingTurns = 0; // New variable to track consecutive losing turns
+    let previousProfit = 0; // New variable to track profit of previous turn
 
     const upkeepCosts = {
         residential: 1,
@@ -372,15 +373,27 @@ document.addEventListener('DOMContentLoaded', () => {
         score -= upkeepCost;
 
         // Check if the city is making a profit or loss
-        if (totalProfit < totalUpkeep) {
+        if (totalProfit === previousProfit) {
             consecutiveLosingTurns++;
         } else {
             consecutiveLosingTurns = 0;
         }
+        previousProfit = totalProfit; // Update previousProfit to current turn's profit
+        console.log("CONSECUTIVE LOSING TURNS: " + consecutiveLosingTurns);
 
         if (consecutiveLosingTurns >= 20) {
             alert('Game Over: The city has been making a loss for 20 consecutive turns.');
-            // Optionally, you can reset the game or take other actions here
+            gridSize = 5;
+            turn = 1;
+            totalProfit = 0;
+            totalUpkeep = 0;
+            score = 0;
+            consecutiveLosingTurns = 0; // Reset consecutive losing turns counter
+            previousProfit = 0; // Reset previous profit
+            grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
+            createGrid(gridSize);
+            updateDisplays();
+            updateTurnDisplay();
         }
 
         // Update displays
@@ -484,6 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalUpkeep = 0;
         score = 0;
         consecutiveLosingTurns = 0; // Reset consecutive losing turns counter
+        previousProfit = 0; // Reset previous profit
         grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
         createGrid(gridSize);
         updateDisplays();
