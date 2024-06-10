@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;
     let totalProfit = 0;
     let totalUpkeep = 0;
+    let consecutiveLosingTurns = 0; // New variable to track consecutive losing turns
 
     const upkeepCosts = {
         residential: 1,
@@ -113,41 +114,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const col = index % gridSize;
 
         if (currentBuilding) {
-            if (turn === 1 || isNextToOrDiagonalToExistingBuilding(row, col)) {
-                cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
-                cell.classList.add(currentBuilding);
-                updateCellIcon(cell, currentBuilding);
+            cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
+            cell.classList.add(currentBuilding);
+            updateCellIcon(cell, currentBuilding);
 
-                grid[row][col] = currentBuilding;
+            grid[row][col] = currentBuilding;
 
-                const earning = calculateCoinEarnings(currentBuilding);
-                totalProfit += earning;
-                score += earning - buildingCost;
-                updateDisplays();
+            const earning = calculateCoinEarnings(currentBuilding);
+            totalProfit += earning;
+            score += earning - buildingCost;
+            updateDisplays();
 
-                if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
-                    expandGrid();
-                }
-                currentBuilding = ''; // Reset the current building selection after placement
-                processTurn();
-            } else {
-                alert('You can only build next to or diagonally to existing buildings.');
+            if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
+                expandGrid();
             }
+            currentBuilding = ''; // Reset the current building selection after placement
+            processTurn();
         } else {
             alert('Select a building first.');
         }
-    }
-
-    function isNextToOrDiagonalToExistingBuilding(row, col) {
-        const directions = [
-            [0, 1], [1, 0], [0, -1], [-1, 0], // adjacent cells
-            [-1, -1], [-1, 1], [1, -1], [1, 1] // diagonal cells
-        ];
-        return directions.some(([dx, dy]) => {
-            const newRow = row + dx;
-            const newCol = col + dy;
-            return newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol];
-        });
     }
 
     function calculateCoinEarnings(buildingType) {
@@ -386,6 +371,18 @@ document.addEventListener('DOMContentLoaded', () => {
         totalUpkeep += upkeepCost;
         score -= upkeepCost;
 
+        // Check if the city is making a profit or loss
+        if (totalProfit < totalUpkeep) {
+            consecutiveLosingTurns++;
+        } else {
+            consecutiveLosingTurns = 0;
+        }
+
+        if (consecutiveLosingTurns >= 20) {
+            alert('Game Over: The city has been making a loss for 20 consecutive turns.');
+            // Optionally, you can reset the game or take other actions here
+        }
+
         // Update displays
         updateDisplays();
         
@@ -486,6 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalProfit = 0;
         totalUpkeep = 0;
         score = 0;
+        consecutiveLosingTurns = 0; // Reset consecutive losing turns counter
         grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
         createGrid(gridSize);
         updateDisplays();
