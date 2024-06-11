@@ -86,6 +86,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateScoreDisplay(); // Ensure score is updated correctly
         updateCoinsDisplay(); // Ensure coins are updated correctly
+
+        // Disable all building buttons initially
+        greyOutBuildings([]);
+
+        // Determine which buildings should be available based on the current game state
+        if (coins > 0) {
+            const buildings = ['residential', 'industry', 'commercial', 'park', 'road'];
+            let selectedBuildings = [];
+            while (selectedBuildings.length < 2) {
+                const randomBuilding = buildings[Math.floor(Math.random() * buildings.length)];
+                if (!selectedBuildings.includes(randomBuilding)) {
+                    selectedBuildings.push(randomBuilding);
+                }
+            }
+            greyOutBuildings(selectedBuildings);
+        }
     }
 
     function resetGrid() {
@@ -159,6 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function placeBuilding(cell, index) {
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
+
+        if (grid[row][col] !== null) {
+            alert('This cell is already occupied.');
+            return;
+        }
 
         if (currentBuilding && (roundNo === 1 || isNextToExistingBuilding(row, col) || isDiagonalToExistingBuilding(row, col))) {
             cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
