@@ -49,31 +49,23 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < size * size; i++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
+            if (size === 15) {
+                cell.classList.add('cell-arcade');
+            }
             cell.dataset.index = i;
             cell.addEventListener('click', (event) => handleCellClick(cell, i, event));
             cityGrid.appendChild(cell);
         }
         cityGrid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+        if (size === 15) {
+            cityGrid.classList.add('city-grid-arcade');
+        } else {
+            cityGrid.classList.remove('city-grid-arcade');
+        }
+        grid = Array(size).fill(null).map(() => Array(size).fill(null));
     }
 
     createGrid(gridSize);
-
-    function expandGrid() {
-        const oldCells = [...document.querySelectorAll('.cell')];
-        gridSize += 2;
-        createGrid(gridSize);
-        const newCells = document.querySelectorAll('.cell');
-
-        for (let i = 0; i < gridSize - 2; i++) {
-            for (let j = 0; j < gridSize - 2; j++) {
-                const oldIndex = i * (gridSize - 2) + j;
-                const newIndex = (i + 1) * gridSize + (j + 1);
-                newCells[newIndex].classList = oldCells[oldIndex].classList;
-                newCells[newIndex].innerHTML = oldCells[oldIndex].innerHTML;
-                grid[Math.floor(newIndex / gridSize)][newIndex % gridSize] = grid[Math.floor(oldIndex / (gridSize - 2))][oldIndex % (gridSize - 2)];
-            }
-        }
-    }
 
     function isBorderCell(index, size) {
         const row = Math.floor(index / size);
@@ -106,6 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
             handleDemolition(cell, index);
         } else if (!isOccupied(cell)) {
             placeBuilding(cell, index);
+            if (isGridFull()) {
+                expandTo15x15();
+            }
         }
     }
 
@@ -127,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDisplays();
 
             if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
-                expandGrid();
+                expandTo15x15();
             }
             currentBuilding = ''; // Reset the current building selection after placement
             processTurn();
@@ -474,6 +469,47 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.style.height = '40px';
         return icon;
     }
+
+    function isGridFull() {
+        for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+                if (grid[row][col] === null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }    
+
+    function expandTo15x15() {
+        if (gridSize === 5 && isGridFull()) {
+            const oldGrid = grid;
+            const oldCells = [...document.querySelectorAll('.cell')];
+            const oldSize = gridSize;
+            gridSize = 15;
+            createGrid(gridSize);
+            const newCells = document.querySelectorAll('.cell');
+            
+            const offset = Math.floor((gridSize - oldSize) / 2);
+    
+            for (let row = 0; row < oldGrid.length; row++) {
+                for (let col = 0; col < oldGrid[row].length; col++) {
+                    if (oldGrid[row][col] !== null) {
+                        const oldIndex = row * oldSize + col;
+                        const newIndex = (row + offset) * gridSize + (col + offset);
+                        newCells[newIndex].classList.add(oldGrid[row][col]);
+                        newCells[newIndex].classList.add('cell-arcade');
+                        updateCellIcon(newCells[newIndex], oldGrid[row][col]);
+                        grid[row + offset][col + offset] = oldGrid[row][col];
+                    }
+                }
+            }
+            document.body.classList.add('grid-expanded'); // Add this line to add the class
+            alert('Grid expanded to 15x15!');
+        }
+    }
+    
+      
 
     buildingButtons.residential.addEventListener('click', () => {
         currentBuilding = 'residential';

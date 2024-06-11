@@ -58,6 +58,36 @@ body {
     flex-grow: 1; /* Allow the game container to grow and take up remaining space */
 }
 
+.grid-expanded .toolbar {
+    top: 5%; /* Adjust the top position to move it up */
+    transform: translateY(-5%); /* Adjust the translate value */
+}
+
+.toolbar-small .toolbar-button {
+    width: 70px;
+    height: 70px; /* Smaller size */
+    font-size: 18px; /* Smaller font size */
+}
+
+.toolbar-small .toolbar-button lord-icon {
+    width: 30px;
+    height: 30px; /* Smaller icon size */
+}
+
+.toolbar-small .button-text {
+    font-size: 11px; /* Smaller text */
+    margin-bottom: 10px; /* Adjust margin */
+}
+
+.grid-expanded .button-container {
+    position: absolute; /* Change position to absolute */
+    top: 80%; /* Adjust this value to move it closer to the grid */
+    left: 50%; /* Center it horizontally */
+    transform: translate(-50%, -50%); /* Center it */
+}
+
+
+
 .city-grid {
     display: grid;
     grid-template-columns: repeat(5, 80px);
@@ -184,7 +214,8 @@ body {
     margin-top: 20px; /* Adjust margin to create space between the top bar and grid */
 }
 
-.cell-arcade {
+/* also uses this when 15x15 */
+.cell-arcade { 
     width: 29px;
     height: 29px;
     background-color: black;
