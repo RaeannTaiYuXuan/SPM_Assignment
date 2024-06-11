@@ -293,12 +293,65 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Game Saved!');
     }
 
+    window.addEventListener('beforeunload', () => {
+        const gameState = {
+            gridSize: gridSize,
+            score: score,
+            turn: turn,
+            totalProfit: totalProfit,
+            totalUpkeep: totalUpkeep,
+            consecutiveLosingTurns: consecutiveLosingTurns,
+            previousProfit: previousProfit,
+            grid: grid,
+            cells: Array.from(document.querySelectorAll('.cell')).map(cell => ({
+                classes: Array.from(cell.classList),
+                innerHTML: cell.innerHTML
+            }))
+        };
+        localStorage.setItem('gameState', JSON.stringify(gameState));
+    });    
+
+    // function loadGameState() {
+    //     const gameState = sessionStorage.getItem('loadedGameState');
+    //     if (!gameState) return;
+    
+    //     const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, consecutiveLosingTurns: savedConsecutiveLosingTurns, previousProfit: savedPreviousProfit, grid: savedGrid, cells: savedCells } = JSON.parse(gameState);
+    
+    //     gridSize = savedGridSize;
+    //     score = savedScore;
+    //     turn = savedTurn;
+    //     totalProfit = savedProfit;
+    //     totalUpkeep = savedUpkeep;
+    //     consecutiveLosingTurns = savedConsecutiveLosingTurns;
+    //     previousProfit = savedPreviousProfit;
+    //     grid = savedGrid;
+    //     createGrid(gridSize);
+    
+    //     const cells = document.querySelectorAll('.cell');
+    //     savedCells.forEach((savedCell, index) => {
+    //         cells[index].className = 'cell';
+    //         savedCell.classes.forEach(cls => cells[index].classList.add(cls));
+    //         cells[index].innerHTML = savedCell.innerHTML;
+    //     });
+    
+    //     updateDisplays();
+    //     updateTurnDisplay();
+    
+    //     if (gridSize === 15) {
+    //         document.body.classList.add('grid-expanded');
+    //         document.querySelector('.toolbar').classList.add('toolbar-small');
+    //     }
+    
+    //     sessionStorage.removeItem('loadedGameState');
+    // }   
+    
+    
     function loadGameState() {
-        const gameState = sessionStorage.getItem('loadedGameState');
+        const gameState = localStorage.getItem('gameState');
         if (!gameState) return;
-    
+
         const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, consecutiveLosingTurns: savedConsecutiveLosingTurns, previousProfit: savedPreviousProfit, grid: savedGrid, cells: savedCells } = JSON.parse(gameState);
-    
+
         gridSize = savedGridSize;
         score = savedScore;
         turn = savedTurn;
@@ -308,24 +361,23 @@ document.addEventListener('DOMContentLoaded', () => {
         previousProfit = savedPreviousProfit;
         grid = savedGrid;
         createGrid(gridSize);
-    
+
         const cells = document.querySelectorAll('.cell');
         savedCells.forEach((savedCell, index) => {
             cells[index].className = 'cell';
             savedCell.classes.forEach(cls => cells[index].classList.add(cls));
             cells[index].innerHTML = savedCell.innerHTML;
         });
-    
+
         updateDisplays();
         updateTurnDisplay();
-    
+
         if (gridSize === 15) {
             document.body.classList.add('grid-expanded');
             document.querySelector('.toolbar').classList.add('toolbar-small');
         }
-    
-        sessionStorage.removeItem('loadedGameState');
-    }    
+    }
+
 
     saveButton.addEventListener('click', saveGame);
 
