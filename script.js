@@ -296,9 +296,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadGameState() {
         const gameState = sessionStorage.getItem('loadedGameState');
         if (!gameState) return;
-
+    
         const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, consecutiveLosingTurns: savedConsecutiveLosingTurns, previousProfit: savedPreviousProfit, grid: savedGrid, cells: savedCells } = JSON.parse(gameState);
-
+    
         gridSize = savedGridSize;
         score = savedScore;
         turn = savedTurn;
@@ -308,18 +308,24 @@ document.addEventListener('DOMContentLoaded', () => {
         previousProfit = savedPreviousProfit;
         grid = savedGrid;
         createGrid(gridSize);
-
+    
         const cells = document.querySelectorAll('.cell');
         savedCells.forEach((savedCell, index) => {
             cells[index].className = 'cell';
             savedCell.classes.forEach(cls => cells[index].classList.add(cls));
             cells[index].innerHTML = savedCell.innerHTML;
         });
-
+    
         updateDisplays();
         updateTurnDisplay();
+    
+        if (gridSize === 15) {
+            document.body.classList.add('grid-expanded');
+            document.querySelector('.toolbar').classList.add('toolbar-small');
+        }
+    
         sessionStorage.removeItem('loadedGameState');
-    }
+    }    
 
     saveButton.addEventListener('click', saveGame);
 
