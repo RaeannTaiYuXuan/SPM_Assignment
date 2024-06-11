@@ -34,18 +34,18 @@ function populateHighScores() {
     });
 }
 
-function exitGame() {
-    // Show a confirmation dialog
-    const confirmation = confirm("Are you sure you want to exit the game?");
-    if (confirmation) {
-        // Redirect to a blank page
-        window.location.href = "about:blank";
-        // Attempt to close after a short delay (e.g., 1 second)
-        setTimeout(() => {
-            window.close();
-        }, 1000);
-    }
-}
+// function exitGame() {
+//     // Show a confirmation dialog
+//     const confirmation = confirm("Are you sure you want to exit the game?");
+//     if (confirmation) {
+//         // Redirect to a blank page
+//         window.location.href = "about:blank";
+//         // Attempt to close after a short delay (e.g., 1 second)
+//         setTimeout(() => {
+//             window.close();
+//         }, 1000);
+//     }
+// }
 
 // Populate the saved games dropdown (dummy data for demonstration)
 function populateSavedGames() {

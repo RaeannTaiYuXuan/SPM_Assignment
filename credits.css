@@ -1,0 +1,62 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    background: black;
+    color: #feda4a;
+}
+
+.star-wars-intro {
+    position: relative;
+    height: 100vh;
+    perspective: 400px;
+    overflow: hidden;
+}
+
+.crawl {
+    position: absolute;
+    top: 100vh;
+    width: 90%;
+    transform-origin: 50% 100%;
+    transform: rotateX(25deg);
+    animation: crawl 60s linear infinite;
+}
+
+@keyframes crawl {
+    0% { top: 100vh; }
+    100% { top: -100vh; }
+}
+
+.title {
+    font-size: 1.5em;
+    text-align: center;
+    margin-bottom: 100px;
+}
+
+.title p {
+    margin: 0;
+}
+
+.title h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.content {
+    font-size: 1em;
+}
+
+.content p, .content ul {
+    margin: 1em 0;
+    text-align: justify;
+}
+
+.content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.content ul li {
+    margin-bottom: 0.5em;
+}
