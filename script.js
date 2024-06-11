@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const gameState = {
-            pageType: window.location.pathname.includes('ArcadeGame') ? 'ArcadeGame' : 'FreePlay',
+            pageType: 'FreePlay',
             gridSize: gridSize,
             score: score,
             turn: turn,
