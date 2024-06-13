@@ -601,7 +601,12 @@ document.addEventListener('DOMContentLoaded', () => {
         createGrid(gridSize);
         updateDisplays();
         updateTurnDisplay();
+        
+        // Remove expanded grid classes
+        document.body.classList.remove('grid-expanded');
+        document.querySelector('.toolbar').classList.remove('toolbar-small');
     });
+    
 
     updateDisplays();
     createGrid(gridSize);
