@@ -309,43 +309,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }))
         };
         localStorage.setItem('gameState', JSON.stringify(gameState));
-    });    
+    });
 
-    // function loadGameState() {
-    //     const gameState = sessionStorage.getItem('loadedGameState');
-    //     if (!gameState) return;
-    
-    //     const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, consecutiveLosingTurns: savedConsecutiveLosingTurns, previousProfit: savedPreviousProfit, grid: savedGrid, cells: savedCells } = JSON.parse(gameState);
-    
-    //     gridSize = savedGridSize;
-    //     score = savedScore;
-    //     turn = savedTurn;
-    //     totalProfit = savedProfit;
-    //     totalUpkeep = savedUpkeep;
-    //     consecutiveLosingTurns = savedConsecutiveLosingTurns;
-    //     previousProfit = savedPreviousProfit;
-    //     grid = savedGrid;
-    //     createGrid(gridSize);
-    
-    //     const cells = document.querySelectorAll('.cell');
-    //     savedCells.forEach((savedCell, index) => {
-    //         cells[index].className = 'cell';
-    //         savedCell.classes.forEach(cls => cells[index].classList.add(cls));
-    //         cells[index].innerHTML = savedCell.innerHTML;
-    //     });
-    
-    //     updateDisplays();
-    //     updateTurnDisplay();
-    
-    //     if (gridSize === 15) {
-    //         document.body.classList.add('grid-expanded');
-    //         document.querySelector('.toolbar').classList.add('toolbar-small');
-    //     }
-    
-    //     sessionStorage.removeItem('loadedGameState');
-    // }   
-    
-    
     function loadGameState() {
         const gameState = localStorage.getItem('gameState');
         if (!gameState) return;
@@ -377,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.toolbar').classList.add('toolbar-small');
         }
     }
-
 
     saveButton.addEventListener('click', saveGame);
 
@@ -468,7 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getConnectedCells(row, col, buildingType) {
         const directions = [
-            [-1, 0], [1, 0], [0, -1], [0, 1] // up, down, left, right
+            [-1, 0], [1, 0], [0, -1], [0, 1], // up, down, left, right
+            [-1, -1], [-1, 1], [1, -1], [1, 1] // diagonals
         ];
         const stack = [[row, col]];
         const connectedCells = new Set([`${row},${col}`]);
@@ -537,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         return true;
-    }    
+    }
 
     function expandTo15x15() {
         if (gridSize === 5 && isGridFull()) {
@@ -566,8 +531,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Grid expanded to 15x15!');
         }
     }
-    
-      
 
     buildingButtons.residential.addEventListener('click', () => {
         currentBuilding = 'residential';
@@ -606,7 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('grid-expanded');
         document.querySelector('.toolbar').classList.remove('toolbar-small');
     });
-    
 
     updateDisplays();
     createGrid(gridSize);
