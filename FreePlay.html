@@ -8,8 +8,12 @@
 </head>
 <body>
     <div class="top-bar">
-        <div class="left-content">$1000</div>
-        <div class="center-content"><a href="#">Ngee Ann City</a></div>
+        <div class="left-content">Current Turn: <span id="turnDisplay">1</span></div>
+        <div class="center-content">
+            Score: <span id="scoreDisplay">0</span> | 
+            Profit: <span id="profitDisplay">0</span> | 
+            Upkeep: <span id="upkeepDisplay">0</span> 
+        </div>
         <div class="right-content"><a href="index.html">Back to Home</a></div>
     </div>
     <div class="game-container" id="gameContainer">
@@ -43,12 +47,8 @@
         </div>
         <div class="button-container">
             <button id="resetButton" class="reset-button">Reset</button>
-        </div>
-        <div class="overlay" id="overlay">
-            <div class="overlay-content">
-                <p>Select anywhere on grid to construct the building.</p>
-                <button id="overlayCloseButton">OK</button>
-            </div>
+            <button id="demolishButton" class="demolish-button">Demolish</button>
+            <button id="saveButton" class="save-button">Save Game</button>
         </div>
     </div>
     <script src="script.js"></script>

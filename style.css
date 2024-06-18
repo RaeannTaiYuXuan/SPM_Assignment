@@ -22,7 +22,7 @@ body {
     border-bottom: 2px solid #FF00FF; /* Neon pink border */
 }
 
-.top-bar a{
+.top-bar a {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
@@ -30,7 +30,6 @@ body {
     color: #00F0FF; /* Neon blue */
     padding: 20px;
     text-decoration: none;
-    
 }
 
 .left-content, .center-content, .right-content {
@@ -38,13 +37,59 @@ body {
     text-align: center;
 }
 
+/* Additional styles for the top-bar content */
+.top-bar .left-content, .top-bar .center-content, .top-bar .right-content {
+    flex: 1;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.top-bar .center-content span {
+    margin: 0 10px;
+}
+
+
 .game-container {
-    position: relative; /* Add relative positioning */
+    position: relative;
     display: flex;
-    flex-direction: column; /* Ensure vertical stacking */
+    flex-direction: column;
     align-items: center;
-    justify-content: center; /* Center content horizontally and vertically */
-    flex-grow: 1; /* Allow the game container to grow and take up remaining space */
+    justify-content: center; 
+    flex-grow: 1; 
+}
+
+.grid-expanded .toolbar {
+    top: 10%; /* move it up */
+    transform: translateY(-5%); 
+}
+
+.toolbar-small .toolbar-button {
+    width: 70px;
+    height: 70px; 
+    font-size: 8px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden; 
+}
+
+.toolbar-small .toolbar-button lord-icon {
+    width: 30px;
+    height: 30px; /* Smaller icon size */
+}
+
+.toolbar-small .button-text {
+    font-size: 9px; 
+    margin-bottom: 5px; 
+}
+
+.grid-expanded .button-container {
+    position: absolute; 
+    top: 80%; 
+    left: 50%; /* Center it horizontally */
+    transform: translate(-50%, -50%); /* Center it */
 }
 
 .city-grid {
@@ -93,6 +138,11 @@ body {
     background-color: rgba(153, 51, 255, 0.8); /* Neon purple */
 }
 
+.cell.selected {
+    border: 2px solid #FFFF00; /* Yellow border to indicate selection */
+}
+
+
 .toolbar {
     display: flex;
     flex-direction: column;
@@ -135,9 +185,9 @@ body {
     margin-bottom: 20px;
 }
 
-/* Add styles for the reset button */
-.reset-button {
-    align-self: center; /* Center the reset button */
+/* Add styles for the reset, save, and demolish buttons */
+.reset-button, .save-button, .demolish-button {
+    align-self: center; /* Center the buttons */
     background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
     color: white;
     border: 2px solid #00F0FF; /* Neon blue border */
@@ -145,11 +195,19 @@ body {
     border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 20px; /* Add margin to create space between the grid and reset button */
+    margin: 10px; /* Add margin to create space between the buttons */
 }
 
-.reset-button:hover {
+.reset-button:hover, .save-button:hover, .demolish-button:hover {
     background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
+}
+
+/* Additional styles for positioning if needed */
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px; /* Adjust margin to create space between the grid and buttons */
 }
 
 .city-grid-arcade {
@@ -160,7 +218,8 @@ body {
     margin-top: 20px; /* Adjust margin to create space between the top bar and grid */
 }
 
-.cell-arcade {
+/* also uses this when 15x15 */
+.cell-arcade { 
     width: 29px;
     height: 29px;
     background-color: black;
@@ -178,22 +237,25 @@ body {
     transform: scale(1.1);
 }
 
-.cell-arcade.house {
+.cell-arcade.residential {
     background-color: rgba(255, 0, 0, 0.8); /* Neon red */
+}
+
+.cell-arcade.industry {
+    background-color: rgba(0, 0, 255, 0.8); /* Neon blue */
+}
+
+.cell-arcade.commercial {
+    background-color: rgba(0, 255, 0, 0.8); /* Neon green */
+}
+
+.cell-arcade.park {
+    background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
 }
 
 .cell-arcade.road {
     background-color: rgba(153, 51, 255, 0.8); /* Neon purple */
 }
-
-.cell-arcade.cafe {
-    background-color: rgba(255, 165, 0, 0.8); /* Neon orange */
-}
-
-.cell-arcade.tall-building {
-    background-color: rgba(255, 255, 0, 0.8); /* Neon yellow */
-}
-
 
 /* Overlay styles */
 .overlay {
@@ -243,7 +305,23 @@ body {
     visibility: visible;
     opacity: 1;
 }
-.greyed-out{
+
+.greyed-out {
     opacity: 0.5;
     pointer-events: none;
+}
+
+/* Score display */
+.score-display {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #00F0FF; /* Neon blue */
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 1000;
 }

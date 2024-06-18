@@ -4,7 +4,7 @@
 # CREDITS
 
 main menu stone button: 
-https://in.pinterest.com/pin/stone-button-vector-hd-png-images--474003929542094028/ 
+https://i.pinimg.com/564x/e6/b2/a2/e6b2a21ec25dbb6b29c31fdf89231686.jpg
 
 main menu background:
 need to change again

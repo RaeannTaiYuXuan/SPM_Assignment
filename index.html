@@ -26,14 +26,14 @@
                     <img src="main_menu_btn.png" alt="Load Saved Game" class="buttonImage">
                     <span class="buttonText">Load Saved Game</span>
                 </button></li>
-                <li><button class="menuButton" onclick="location.href='#';">
+                <li><button class="menuButton" onclick="showHighScoresOverlay();">
                     <img src="main_menu_btn.png" alt="Display High Scores" class="buttonImage">
                     <span class="buttonText">Display High Scores</span>
                 </button></li>
-                <li><button class="menuButton" onclick="location.href='#';">
-                    <img src="main_menu_btn.png" alt="Exit Game" class="buttonImage">
-                    <span class="buttonText">Exit Game</span>
-                </button></li>
+                <li><button class="menuButton" onclick="window.location.href='credits.html';">
+                        <img src="main_menu_btn.png" alt="Credits" class="buttonImage">
+                        <span class="buttonText">Credits</span>
+                    </button></li>           
             </ul>
         </nav>
     </div>
@@ -52,6 +52,25 @@
                     <button type="button" onclick="hideLoadGameOverlay()" class="btn btn-secondary">Cancel</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Overlay for displaying high scores -->
+    <div class="overlay" id="highScoresOverlay">
+        <div class="overlay-content">
+            <h2>High Scores</h2>
+            <table id="highScoresTable">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- High scores will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <button type="button" onclick="hideHighScoresOverlay()" class="btn btn-secondary">Close</button>
         </div>
     </div>
 

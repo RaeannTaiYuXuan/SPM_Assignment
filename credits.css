@@ -1,0 +1,83 @@
+/* styles.css */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    background: black;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    perspective: 400px;
+}
+
+.star-wars-intro {
+    position: relative;
+    width: 60%;
+    height: 100vh;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    perspective: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.crawl {
+    position: absolute;
+    top: 100vh;
+    width: 80%;
+    text-align: center;
+    transform-origin: 50% 100%;
+    transform: rotateX(25deg);
+    animation: crawl 60s linear infinite;
+}
+
+@keyframes crawl {
+    0% { top: 100vh; }
+    100% { top: -100vh; }
+}
+
+.title {
+    font-size: 1.5em;
+    text-align: center;
+    margin-bottom: 50px;
+    color: aqua;
+}
+
+.title p {
+    margin: 0;
+}
+
+.title h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.content {
+    font-size: 1em;
+    text-align: justify;
+}
+
+.content p, .content ul {
+    margin: 1em 0;
+}
+
+.content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.content ul li {
+    margin-bottom: 0.5em;
+}
+
+.main-menu-button {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+}
