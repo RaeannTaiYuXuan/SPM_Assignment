@@ -290,13 +290,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
                 break;
             case 'industry':
-                icon = createLordicon("https://cdn.lordicon.com/zneicxkd.json");
+                icon = createGifIcon("icons8-industrial.gif", 25, 25); // Resized to 30x30;
                 break;
             case 'commercial':
                 icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
                 break;
             case 'park':
-                icon = createLordicon("https://cdn.lordicon.com/gfseemfv.json");
+                icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
                 break;
             case 'road':
                 const orientation = getRoadOrientation(row, col);
