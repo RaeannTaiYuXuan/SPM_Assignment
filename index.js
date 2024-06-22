@@ -1,3 +1,11 @@
+document.querySelectorAll('.menuButton').forEach(button => {
+    button.addEventListener('click', function () {
+        if (this.textContent.trim() === 'Start Free Play Game') {
+            sessionStorage.removeItem('loadedGameState'); // Clear any previously loaded game state
+        }
+    });
+});
+
 // Show the high scores overlay
 function showHighScoresOverlay() {
     const overlay = document.getElementById('highScoresOverlay');
