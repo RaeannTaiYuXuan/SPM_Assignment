@@ -494,13 +494,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
                 break;
             case 'industry':
-                icon = createLordicon("https://cdn.lordicon.com/zneicxkd.json");
+                icon = createGifIcon("icons8-industrial.gif", 40, 40); // Resized to 30x30;
                 break;
             case 'commercial':
                 icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
                 break;
             case 'park':
-                icon = createLordicon("https://cdn.lordicon.com/gfseemfv.json");
+                icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
                 break;
             case 'road':
                 const orientation = getRoadOrientation(row, col);
@@ -539,6 +539,13 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.trigger = 'hover';
         icon.style.width = '40px';
         icon.style.height = '40px';
+        return icon;
+    }
+    function createGifIcon(src, width, height) {
+        const icon = document.createElement('img');
+        icon.src = src;
+        icon.style.width = `${width}px`;
+        icon.style.height = `${height}px`;
         return icon;
     }
 
