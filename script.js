@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0;
     let totalProfit = 0;
     let totalUpkeep = 0;
-    let consecutiveLosingTurns = 0; // New variable to track consecutive losing turns
-    let previousProfit = 0; // New variable to track profit of previous turn
+    let consecutiveLosingTurns = 0;
+    let previousProfit = 0;
 
     const upkeepCosts = {
         residential: 1,
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentBuilding) {
             cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
             cell.classList.add(currentBuilding);
-            updateCellIcon(cell, currentBuilding);
+            updateCellIcon(cell, currentBuilding, row, col);
 
             grid[row][col] = currentBuilding;
 
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
                 expandTo15x15();
             }
-            currentBuilding = ''; // Reset the current building selection after placement
+            currentBuilding = '';
             processTurn();
         } else {
             alert('Select a building first.');
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateDisplays() {
         profitDisplay.textContent = totalProfit;
         upkeepDisplay.textContent = totalUpkeep;
-        scoreDisplay.textContent = calculateScore();  // Update the score display
+        scoreDisplay.textContent = calculateScore();
         updateTurnDisplay();
     }
 
@@ -146,12 +146,10 @@ document.addEventListener('DOMContentLoaded', () => {
         turnDisplay.textContent = turn;
     }
 
-    // Calculate scores for different building types
     function calculateScore() {
         let score = 0;
         let industryCount = 0;
 
-        // Calculate score for each type of building
         for (let row = 0; row < gridSize; row++) {
             for (let col = 0; col < gridSize; col++) {
                 if (grid[row][col] !== null) {
@@ -175,11 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        score += industryCount; // Add the total industry count to the score once
+        score += industryCount;
         return score;
     }
 
-    // Helper functions to calculate scores for each type of building
     function scoreResidential(row, col) {
         const neighbors = getNeighbors(row, col);
         let score = 0;
@@ -212,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        return industryCount; // Each industry scores based on the total number of industries in the city
+        return industryCount;
     }
 
     function scoreCommercial(row, col) {
@@ -248,11 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return score;
     }
 
-    // Get neighboring cells
     function getNeighbors(row, col) {
         const directions = [
-            [-1, 0], [1, 0], [0, -1], [0, 1], // up, down, left, right
-            [-1, -1], [-1, 1], [1, -1], [1, 1] // diagonals
+            [-1, 0], [1, 0], [0, -1], [0, 1],
+            [-1, -1], [-1, 1], [1, -1], [1, 1]
         ];
         return directions
             .map(([dx, dy]) => [row + dx, col + dy])
@@ -361,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 score += 1;
                 updateDisplays();
                 alert('Building demolished. You earned 1 coin.');
-                processTurn();  // Automatic upkeep after demolition
+                processTurn();
             }
         } else {
             alert('This cell is empty. Choose a cell with a building to demolish.');
@@ -372,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
     demolishButton.addEventListener('click', demolishBuilding);
 
     function processTurn() {
-        // Automatically calculate upkeep costs
         let upkeepCost = 0;
         const visited = new Set();
 
@@ -395,23 +390,20 @@ document.addEventListener('DOMContentLoaded', () => {
         totalUpkeep += upkeepCost;
         score -= upkeepCost;
 
-        // Check if the city is making a profit or loss
         if (totalProfit === previousProfit) {
             consecutiveLosingTurns++;
         } else {
             consecutiveLosingTurns = 0;
         }
-        previousProfit = totalProfit; // Update previousProfit to current turn's profit
+        previousProfit = totalProfit;
 
         if (consecutiveLosingTurns >= 20) {
             alert('Game Over: The city has been making a loss for 20 consecutive turns.');
             resetGame();
         }
 
-        // Update displays
         updateDisplays();
         
-        // Increment the turn
         turn++;
         updateTurnDisplay();
     }
@@ -422,9 +414,9 @@ document.addEventListener('DOMContentLoaded', () => {
         totalProfit = 0;
         totalUpkeep = 0;
         score = 0;
-        consecutiveLosingTurns = 0; // Reset consecutive losing turns counter
-        previousProfit = 0; // Reset previous profit
-        grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
+        consecutiveLosingTurns = 0;
+        previousProfit = 0;
+        grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
         createGrid(gridSize);
         updateDisplays();
         updateTurnDisplay();
@@ -432,8 +424,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getConnectedCells(row, col, buildingType) {
         const directions = [
-            [-1, 0], [1, 0], [0, -1], [0, 1], // up, down, left, right
-            [-1, -1], [-1, 1], [1, -1], [1, 1] // diagonals
+            [-1, 0], [1, 0], [0, -1], [0, 1],
+            [-1, -1], [-1, 1], [1, -1], [1, 1]
         ];
         const stack = [[row, col]];
         const connectedCells = new Set([`${row},${col}`]);
@@ -459,7 +451,43 @@ document.addEventListener('DOMContentLoaded', () => {
         return connectedCells;
     }
 
-    function updateCellIcon(cell, buildingType) {
+    function getRoadOrientation(row, col) {
+        const directions = {
+            horizontal: [[0, -1], [0, 1]],
+            vertical: [[-1, 0], [1, 0]]
+        };
+        
+        let isHorizontal = false;
+        let isVertical = false;
+        
+        directions.horizontal.forEach(([dx, dy]) => {
+            const newRow = row + dx;
+            const newCol = col + dy;
+            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
+                isHorizontal = true;
+            }
+        });
+        
+        directions.vertical.forEach(([dx, dy]) => {
+            const newRow = row + dx;
+            const newCol = col + dy;
+            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
+                isVertical = true;
+            }
+        });
+        
+        if (isHorizontal && isVertical) {
+            return 'both';
+        } else if (isHorizontal) {
+            return 'horizontal';
+        } else if (isVertical) {
+            return 'vertical';
+        } else {
+            return 'none';
+        }
+    }
+
+    function updateCellIcon(cell, buildingType, row, col) {
         let icon;
         switch (buildingType) {
             case 'residential':
@@ -475,7 +503,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/gfseemfv.json");
                 break;
             case 'road':
-                icon = createLordicon("https://cdn.lordicon.com/zneicxkd.json");
+                const orientation = getRoadOrientation(row, col);
+                if (orientation === 'horizontal') {
+                    icon = createImage("road_horizontal.png", "road-horizontal-animation");
+                } else if (orientation === 'vertical') {
+                    icon = createImage("road.png", "road-vertical-animation");
+                } else {
+                    icon = createImage("road.png", "road-default-animation");
+                }
                 break;
             default:
                 return;
@@ -483,6 +518,20 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
+    
+    function createImage(src, animationClass) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.classList.add('icon-image');
+        if (animationClass) {
+            img.classList.add(animationClass); // Add the animation class
+        }
+        img.style.width = '100%'; // Adjusting the size to fit the cell
+        img.style.height = '100%'; // Adjusting the size to fit the cell
+        return img;
+    }
+    
+    
 
     function createLordicon(src) {
         const icon = document.createElement('lord-icon');
@@ -492,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.style.height = '40px';
         return icon;
     }
+
 
     function isGridFull() {
         for (let row = 0; row < gridSize; row++) {
@@ -527,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-            document.body.classList.add('grid-expanded'); // Add this line to add the class
+            document.body.classList.add('grid-expanded');
             alert('Grid expanded to 15x15!');
         }
     }
@@ -558,14 +608,13 @@ document.addEventListener('DOMContentLoaded', () => {
         totalProfit = 0;
         totalUpkeep = 0;
         score = 0;
-        consecutiveLosingTurns = 0; // Reset consecutive losing turns counter
-        previousProfit = 0; // Reset previous profit
-        grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null)); // Reset grid state
+        consecutiveLosingTurns = 0;
+        previousProfit = 0;
+        grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
         createGrid(gridSize);
         updateDisplays();
         updateTurnDisplay();
         
-        // Remove expanded grid classes
         document.body.classList.remove('grid-expanded');
         document.querySelector('.toolbar').classList.remove('toolbar-small');
     });
