@@ -80,6 +80,8 @@ body {
     height: 30px; /* Smaller icon size */
 }
 
+
+
 .toolbar-small .button-text {
     font-size: 9px; 
     margin-bottom: 5px; 
@@ -154,6 +156,9 @@ body {
 }
 
 .toolbar-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background-color: rgba(69, 123, 157, 0.8); /* Translucent nicer blue */
     color: white;
     border: 2px solid #00F0FF; /* Neon blue border */
@@ -164,18 +169,17 @@ body {
     cursor: pointer;
     font-size: 24px;
     transition: background-color 0.3s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    padding: 10px; /* Added padding for better alignment */
 }
 
 .toolbar-button:hover {
     background-color: rgba(42, 157, 143, 0.8); /* Translucent nicer green */
 }
 
-.toolbar-button lord-icon {
-    margin-top: 10px;
+.button-icon {
+    width: 50px; /* Adjust the width as needed */
+    height: 50px; /* Adjust the height as needed */
+    margin-bottom: 5px; /* Space between the icon and the text */
 }
 
 .button-text {
@@ -184,6 +188,9 @@ body {
     margin-top: auto; /* Ensure text is at the bottom */
     margin-bottom: 20px;
 }
+
+
+
 
 /* Add styles for the reset, save, and demolish buttons */
 .reset-button, .save-button, .demolish-button {
@@ -324,4 +331,29 @@ body {
     font-size: 20px;
     font-weight: bold;
     z-index: 1000;
+}
+
+
+/* icon */
+
+.icon-image {
+    width: 100px; /* Adjust the size as needed */
+    height: 100px; /* Adjust the size as needed */
+    margin-top:5px ;
+    margin-right: 3px; /* Adjust spacing between the icon and text */
+}
+
+@keyframes road-curved-animation {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+.road-curved-animation {
+    animation: road-curved-animation 0.5s forwards;
+}
+/* Ensure the images are properly sized */
+.icon-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
