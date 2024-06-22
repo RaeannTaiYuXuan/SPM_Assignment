@@ -245,23 +245,68 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateCellIcon(cell, buildingType) {
+
+
+   function getRoadOrientation(row, col) {
+        const directions = {
+            horizontal: [[0, -1], [0, 1]],
+            vertical: [[-1, 0], [1, 0]]
+        };
+        
+        let isHorizontal = false;
+        let isVertical = false;
+        
+        directions.horizontal.forEach(([dx, dy]) => {
+            const newRow = row + dx;
+            const newCol = col + dy;
+            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
+                isHorizontal = true;
+            }
+        });
+        
+        directions.vertical.forEach(([dx, dy]) => {
+            const newRow = row + dx;
+            const newCol = col + dy;
+            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
+                isVertical = true;
+            }
+        });
+        
+        if (isHorizontal && isVertical) {
+            return 'both';
+        } else if (isHorizontal) {
+            return 'horizontal';
+        } else if (isVertical) {
+            return 'vertical';
+        } else {
+            return 'none';
+        }
+    }
+
+    function updateCellIcon(cell, buildingType, row, col) {
         let icon;
         switch (buildingType) {
             case 'residential':
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
                 break;
             case 'industry':
-                icon = createGifIcon("icons8-industrial.gif", 25, 25); // Resized to 30x30
+                icon = createLordicon("https://cdn.lordicon.com/zneicxkd.json");
                 break;
             case 'commercial':
                 icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
                 break;
             case 'park':
-                icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
+                icon = createLordicon("https://cdn.lordicon.com/gfseemfv.json");
                 break;
             case 'road':
-                icon = createLordicon("https://cdn.lordicon.com/zneicxkd.json");
+                const orientation = getRoadOrientation(row, col);
+                if (orientation === 'horizontal') {
+                    icon = createImage("road_horizontal.png", "road-horizontal-animation");
+                } else if (orientation === 'vertical') {
+                    icon = createImage("road.png", "road-vertical-animation");
+                } else {
+                    icon = createImage("road.png", "road-default-animation");
+                }
                 break;
             default:
                 return;
@@ -269,6 +314,20 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
+
+
+    function createImage(src, animationClass) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.classList.add('icon-image');
+        if (animationClass) {
+            img.classList.add(animationClass); // Add the animation class
+        }
+        img.style.width = '100%'; // Adjusting the size to fit the cell
+        img.style.height = '100%'; // Adjusting the size to fit the cell
+        return img;
+    }
+    
 
     function createLordicon(src) {
         const icon = document.createElement('lord-icon');
