@@ -628,5 +628,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateDisplays();
     createGrid(gridSize);
-    loadGameState();
+    
+    // Only load game state if it was set to be loaded (from 'Load Saved Game')
+    if (sessionStorage.getItem('loadedGameState')) {
+        loadGameState();
+    }
 });
