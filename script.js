@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        totalUpkeep += upkeepCost;
+        totalUpkeep = upkeepCost;
         score -= upkeepCost;
 
         if (totalProfit === previousProfit) {
