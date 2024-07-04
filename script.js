@@ -73,17 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return row === 0 || row === size - 1 || col === 0 || col === size - 1;
     }
 
-    function allBordersFilled(size) {
-        for (let i = 0; i < size; i++) {
-            if (!isOccupied(document.querySelector(`.cell[data-index="${i}"]`)) ||
-                !isOccupied(document.querySelector(`.cell[data-index="${size * (size - 1) + i}"]`)) ||
-                !isOccupied(document.querySelector(`.cell[data-index="${i * size}"]`)) ||
-                !isOccupied(document.querySelector(`.cell[data-index="${i * size + size - 1}"]`))) {
-                return false;
-            }
-        }
-        return true;
-    }
+    // function allBordersFilled(size) {
+    //     for (let i = 0; i < size; i++) {
+    //         if (!isOccupied(document.querySelector(`.cell[data-index="${i}"]`)) ||
+    //             !isOccupied(document.querySelector(`.cell[data-index="${size * (size - 1) + i}"]`)) ||
+    //             !isOccupied(document.querySelector(`.cell[data-index="${i * size}"]`)) ||
+    //             !isOccupied(document.querySelector(`.cell[data-index="${i * size + size - 1}"]`))) {
+    //             return false;
+    //         }
+    //     }
+    //     return true;
+    // }
 
     function isOccupied(cell) {
         return cell.classList.contains('residential') ||
@@ -105,20 +105,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const buildingCost = 1;
         const row = Math.floor(index / gridSize);
         const col = index % gridSize;
-
+    
         if (currentBuilding) {
             cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
             cell.classList.add(currentBuilding);
             updateCellIcon(cell, currentBuilding, row, col);
-
+    
             grid[row][col] = currentBuilding;
-
+    
             const earning = calculateCoinEarnings(currentBuilding);
             totalProfit += earning;
             score += earning - buildingCost;
             updateDisplays();
-
-            if (isBorderCell(index, gridSize) && allBordersFilled(gridSize)) {
+    
+            if (isBorderCell(index, gridSize)) {
                 expandTo15x15();
             }
             currentBuilding = '';
@@ -127,6 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Select a building first.');
         }
     }
+    
+ 
+    
 
     function calculateCoinEarnings(buildingType) {
         return earningRates[buildingType];
