@@ -1,15 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // SIDE BAR 
-    function openNav() {
-        document.getElementById("mySidebar").style.width = "450px";
-    }
-
-    function closeNav() {
-        document.getElementById("mySidebar").style.width = "0";
-    }
-    document.querySelector('.openbtn').addEventListener('click', openNav);
-    document.querySelector('.closebtn').addEventListener('click', closeNav);
-
     const cityGridArcade = document.getElementById('cityGridArcade');
     const resetButtonArcade = document.getElementById('resetButtonArcade');
     const saveButtonArcade = document.getElementById('saveButtonArcade');
@@ -23,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const coinsHTML = document.getElementById('coins');
     const scoreDisplay = document.getElementById('scoreDisplay');
+    const highScoreDisplay = document.getElementById('highScoreDisplay');
 
     let currentBuilding = '';
     let roundNo = 0;
@@ -68,6 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
             score: calculateScore() // Ensure score is saved correctly
         };
         localStorage.setItem(`arcadeGameState_${fileName}`, JSON.stringify(gameState));
+
+        // Save high score
+        saveHighScore(fileName, gameState.score);
+
         alert('Game Saved!');
     }
 
@@ -104,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Determine which buildings should be available based on the current game state
         if (coins > 0) {
             const buildings = ['residential', 'industry', 'commercial', 'park', 'road'];
-            let selectedBuildings = []; 
+            let selectedBuildings = [];
             while (selectedBuildings.length < 2) {
                 const randomBuilding = buildings[Math.floor(Math.random() * buildings.length)];
                 if (!selectedBuildings.includes(randomBuilding)) {
@@ -141,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             roundNo++;
             coins--;
             const buildings = ['residential', 'industry', 'commercial', 'park', 'road'];
-            let selectedBuildings = ['road']; //DELETE!!  
+            let selectedBuildings = [];
             while (selectedBuildings.length < 2) {
                 const randomBuilding = buildings[Math.floor(Math.random() * buildings.length)];
                 if (!selectedBuildings.includes(randomBuilding)) {
@@ -195,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentBuilding && (roundNo === 1 || isNextToExistingBuilding(row, col) || isDiagonalToExistingBuilding(row, col))) {
             cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
             cell.classList.add(currentBuilding);
-            updateCellIcon(cell, currentBuilding,row,col);
+            updateCellIcon(cell, currentBuilding, row, col);
             grid[row][col] = currentBuilding;
             currentBuilding = '';
             startNewRound();
@@ -338,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
                 break;
             case 'industry':
-                icon = createGifIcon("icons8-industrial.gif", 40, 40);
+                icon = createGifIcon("icons8-industrial.gif", 28, 28);
                 break;
             case 'commercial':
                 icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
@@ -547,6 +541,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCoinsDisplay() {
         coinsHTML.textContent = `Coins: ${coins}`;
     }
+
+    function saveHighScore(name, score) {
+        const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+        highScores.push({ name, score });
+        highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
+        if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
+        localStorage.setItem('highScores', JSON.stringify(highScores));
+        updateHighScoreDisplay();
+    }
+
+    function getHighScores() {
+        return JSON.parse(localStorage.getItem('highScores')) || [];
+    }
+
+    function updateHighScoreDisplay() {
+        const highScores = getHighScores();
+        highScoreDisplay.innerHTML = highScores.map((score, index) => 
+            `<div>${index + 1}. ${score.name}: ${score.score}</div>`
+        ).join('');
+    }
+
+    // Initial load of high scores
+    updateHighScoreDisplay();
 
     loadGameState();
     if (!gameLoaded) {
