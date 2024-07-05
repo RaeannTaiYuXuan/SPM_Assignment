@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // SIDE BAR 
+    function openNav() {
+        document.getElementById("mySidebar").style.width = "450px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+    }
+    document.querySelector('.openbtn').addEventListener('click', openNav);
+    document.querySelector('.closebtn').addEventListener('click', closeNav);
+
     const cityGridArcade = document.getElementById('cityGridArcade');
     const resetButtonArcade = document.getElementById('resetButtonArcade');
     const saveButtonArcade = document.getElementById('saveButtonArcade');

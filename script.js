@@ -44,6 +44,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
 
+    // SIDE BAR :
+     function openNav() {
+        document.getElementById("mySidebar").style.width = "450px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+    }
+    document.querySelector('.openbtn').addEventListener('click', openNav);
+    document.querySelector('.closebtn').addEventListener('click', closeNav);
+
     function createGrid(size) {
         cityGrid.innerHTML = '';
         for (let i = 0; i < size * size; i++) {
