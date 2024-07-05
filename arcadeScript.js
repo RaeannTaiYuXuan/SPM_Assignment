@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             roundNo++;
             coins--;
             const buildings = ['residential', 'industry', 'commercial', 'park', 'road'];
-            let selectedBuildings = ['road'];  // DELETE!!!!!!!!!
+            let selectedBuildings = [];  
             while (selectedBuildings.length < 2) {
                 const randomBuilding = buildings[Math.floor(Math.random() * buildings.length)];
                 if (!selectedBuildings.includes(randomBuilding)) {
