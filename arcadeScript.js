@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Determine which buildings should be available based on the current game state
         if (coins > 0) {
             const buildings = ['residential', 'industry', 'commercial', 'park', 'road'];
-            let selectedBuildings = [];
+            let selectedBuildings = []; 
             while (selectedBuildings.length < 2) {
                 const randomBuilding = buildings[Math.floor(Math.random() * buildings.length)];
                 if (!selectedBuildings.includes(randomBuilding)) {
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             roundNo++;
             coins--;
             const buildings = ['residential', 'industry', 'commercial', 'park', 'road'];
-            let selectedBuildings = [];  
+            let selectedBuildings = ['road']; //DELETE!!  
             while (selectedBuildings.length < 2) {
                 const randomBuilding = buildings[Math.floor(Math.random() * buildings.length)];
                 if (!selectedBuildings.includes(randomBuilding)) {
@@ -245,28 +245,83 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-
-    function ifHorizontal(row, col,gridSize) {
-        console.log('IF HORIZONTAL:',row,col);
-        const colValues =[];
-        for (let i = 1; i < gridSize-1; i++) {
-            colValues.push(i);
+    function roadOrientation(row, col, gridSize) {
+        console.log('ROAD ORIENTATION:', row, col);
+        const middleValue = Math.floor(gridSize / 2) + 1;
+        const horizontalValues = [];
+    
+        // Define corner values: row, column
+        let cornerValues = {
+            'topLeftCorner': [0, 0],
+            'bottomLeftCorner': [gridSize - 1, 0],
+            'topRightCorner': [0, gridSize - 1],
+            'bottomRightCorner': [gridSize - 1, gridSize - 1]
+        };
+        let innerboxes = [];
+        innerboxes.push(cornerValues);
+    
+        // Propagating all the corner values of inner boxes
+        // Total no of boxes: middleValue - 1
+        let count = 0;
+        while (count < middleValue - 1) {
+            count++;
+            let newCornerValues = {
+                'topLeftCorner': [innerboxes[count - 1]['topLeftCorner'][0] + 1, innerboxes[count - 1]['topLeftCorner'][1] + 1],
+                'bottomLeftCorner': [innerboxes[count - 1]['bottomLeftCorner'][0] - 1, innerboxes[count - 1]['bottomLeftCorner'][1] + 1],
+                'topRightCorner': [innerboxes[count - 1]['topRightCorner'][0] + 1, innerboxes[count - 1]['topRightCorner'][1] - 1],
+                'bottomRightCorner': [innerboxes[count - 1]['bottomRightCorner'][0] - 1, innerboxes[count - 1]['bottomRightCorner'][1] - 1]
+            };
+            innerboxes.push(newCornerValues);
         }
-        console.log('COLVALUES:',colValues);
-        if (colValues.includes(col)){
-            if (row === 0 || row === gridSize-1){
-                return 'horizontal';
+        // GET HORIZONTAL VALUES
+        let countHorizontal = 0;
+        let startValue = 1;
+        let endValue = gridSize;
+
+        while (countHorizontal< middleValue-1){
+            let colValues = [];
+            for(let i = startValue; i<endValue;i++){
+                colValues.push(i);
             }
-        }else{
-            return 'none';
+            let match = {};
+            match[countHorizontal] = colValues;
+            countHorizontal++;
+            startValue++;
+            endValue--;
+            horizontalValues.push(match);
         }
-    }
 
+        if (row === middleValue - 1 && col === middleValue - 1) {
+            return 'default';
+        } 
+        if (innerboxes.length > 0) {
+            let placement = [row, col];
+            for (const box of innerboxes) {
+                for (const [key, value] of Object.entries(box)) {
+                    if (placement[0] === value[0] && placement[1] === value[1]) {
+                        return key;
+                    }
+                }
+            }
+        } 
+        if (horizontalValues.length > 0) {
+            console.log('ROW', row, col);
+            for (const horizontalRow of horizontalValues) {
+                for (const [key, value] of Object.entries(horizontalRow)) {
+                    console.log('Key:', key, 'Value:', value);
+                    if (row === parseInt(key) && value.includes(col)) {
+                        return 'horizontal';
+                    }
+                }
+            }
+        }
+        
+        
+        return 'none';
+    }
+    
     function updateCellIcon(cell, buildingType, row, col) {
         let icon;
-        const orientation = ifHorizontal(row,col,gridSize);
-        console.log('ROW + COL',row,col);
         switch (buildingType) {
             case 'residential':
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
@@ -281,18 +336,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
                 break;
             case 'road':
-                console.log('ORIENTATION:',orientation);
+                const orientation = roadOrientation(row, col, gridSize);
+                console.log('ORIENTATION:', orientation);
                 if (orientation === 'horizontal') {
                     icon = createImage("road_horizontal.png", "road-horizontal-animation");
-                } else if (row === 0 && col === 0) {
+                } else if (orientation === 'topLeftCorner') {
                     icon = createImage("road_top_left.png", "road-top-left-animation");
-                } else if (row === gridSize - 1 && col === 0) {
+                } else if (orientation === 'bottomLeftCorner') {
                     icon = createImage("road_bottom_left.png", "road-bottom-left-animation");
-                } else if (row === 0 && col === gridSize-1){
+                } else if (orientation === 'topRightCorner') {
                     icon = createImage("road_top_right.png", "road-top-right-animation");
-                } else if (row === gridSize-1 && row === gridSize-1){
+                } else if (orientation === 'bottomRightCorner') {
                     icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
-                }
+                }else if (orientation === 'none'){
+                    icon = createImage("road.png", "road-default-animation");
+                } 
                 else {
                     icon = createImage("road.png", "road-default-animation");
                 }
@@ -302,6 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
+    
+    
     
     function createImage(src, animationClass) {
         const img = document.createElement('img');
