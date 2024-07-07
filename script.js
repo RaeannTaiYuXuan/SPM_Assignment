@@ -1,3 +1,7 @@
+// Variables to track if the game was loaded and the game name
+let isLoadedGame = false;
+let loadedGameName = '';
+
 let gridSize = 5;
 let currentBuilding = '';
 let demolitionMode = false;
@@ -267,6 +271,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveGame() {
+        // If it's a loaded game, save with the existing name and alert the user
+        if (isLoadedGame) {
+            const gameState = {
+                pageType: 'FreePlay',
+                gridSize: gridSize,
+                score: score,
+                turn: turn,
+                totalProfit: totalProfit,
+                totalUpkeep: totalUpkeep,
+                consecutiveLosingTurns: consecutiveLosingTurns,
+                previousProfit: previousProfit,
+                grid: grid,
+                cells: Array.from(document.querySelectorAll('.cell')).map(cell => ({
+                    classes: Array.from(cell.classList),
+                    innerHTML: cell.innerHTML
+                }))
+            };
+            localStorage.setItem(`gameState_${loadedGameName}`, JSON.stringify(gameState));
+            alert('Game saved!');
+            return;
+        }
+
         const fileName = prompt("Enter a name for your save game:");
         if (fileName === null || fileName.trim() === '') {
             alert('Save cancelled or invalid name entered.');
@@ -349,6 +375,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('grid-expanded');
             document.querySelector('.toolbar').classList.add('toolbar-small');
         }
+
+        // CHANGED: Mark the game as loaded and set the loaded game name
+        isLoadedGame = true;
+        loadedGameName = sessionStorage.getItem('loadedGameName') || '';
     }
 
     saveButton.addEventListener('click', saveGame);
