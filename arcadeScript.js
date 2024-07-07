@@ -548,22 +548,11 @@ document.addEventListener('DOMContentLoaded', () => {
         highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
         if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
         localStorage.setItem('highScores', JSON.stringify(highScores));
-        updateHighScoreDisplay();
     }
 
     function getHighScores() {
         return JSON.parse(localStorage.getItem('highScores')) || [];
     }
-
-    function updateHighScoreDisplay() {
-        const highScores = getHighScores();
-        highScoreDisplay.innerHTML = highScores.map((score, index) => 
-            `<div>${index + 1}. ${score.name}: ${score.score}</div>`
-        ).join('');
-    }
-
-    // Initial load of high scores
-    updateHighScoreDisplay();
 
     loadGameState();
     if (!gameLoaded) {

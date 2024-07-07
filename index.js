@@ -19,29 +19,30 @@ function hideHighScoresOverlay() {
     overlay.classList.remove('show');
 }
 
-// Populate the high scores table (dummy data for demonstration)
+// Populate the high scores table from local storage
 function populateHighScores() {
-    const highScores = [
-        { name: 'Player1', score: 10000 },
-        { name: 'Player2', score: 8000 },
-        { name: 'Player3', score: 6000 },
-        { name: 'Player4', score: 4000 },
-        { name: 'Player5', score: 2000 }
-    ];
+    const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     const highScoresTableBody = document.querySelector('#highScoresTable tbody');
     highScoresTableBody.innerHTML = '';
-    highScores.forEach(score => {
+
+    for (let i = 0; i < 10; i++) {
         const row = document.createElement('tr');
         const playerNameCell = document.createElement('td');
         const playerScoreCell = document.createElement('td');
-        playerNameCell.textContent = score.name;
-        playerScoreCell.textContent = score.score;
+
+        if (highScores[i]) {
+            playerNameCell.textContent = highScores[i].name;
+            playerScoreCell.textContent = highScores[i].score;
+        } else {
+            playerNameCell.textContent = '-';
+            playerScoreCell.textContent = '-';
+        }
+
         row.appendChild(playerNameCell);
         row.appendChild(playerScoreCell);
         highScoresTableBody.appendChild(row);
-    });
+    }
 }
-
 // function exitGame() {
 //     // Show a confirmation dialog
 //     const confirmation = confirm("Are you sure you want to exit the game?");
