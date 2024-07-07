@@ -91,8 +91,7 @@ function loadSavedGame() {
     const gameState = localStorage.getItem(selectedGameKey);
     if (gameState) {
         sessionStorage.setItem('loadedGameState', gameState);
-        // CHANGED: Store the loaded game name in session storage
-        sessionStorage.setItem('loadedGameName', selectedGameKey.replace('gameState_', ''));
+        sessionStorage.setItem('loadedGameName', selectedGameKey.replace('arcadeGameState_', ''));  // CHANGED HERE: Store the loaded game name
         const { pageType } = JSON.parse(gameState);
         if (pageType === 'ArcadeGame') {
             location.href = 'ArcadeGame.html';
