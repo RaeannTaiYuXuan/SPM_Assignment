@@ -1,3 +1,29 @@
+let gridSize = 5;
+let currentBuilding = '';
+let demolitionMode = false;
+let turn = 1;
+let score = 0;
+let totalProfit = 0;
+let totalUpkeep = 0;
+let consecutiveLosingTurns = 0;
+let previousProfit = 0;
+
+const upkeepCosts = {
+    residential: 1,
+    industry: 1,
+    commercial: 2,
+    park: 1,
+    road: 1
+};
+
+const earningRates = {
+    residential: 1,
+    industry: 2,
+    commercial: 3,
+    park: 0,
+    road: 0
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const cityGrid = document.getElementById('cityGrid');
     const resetButton = document.getElementById('resetButton');
@@ -15,32 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreDisplay = document.getElementById('scoreDisplay');
     const profitDisplay = document.getElementById('profitDisplay');
     const upkeepDisplay = document.getElementById('upkeepDisplay');
-
-    let gridSize = 5;
-    let currentBuilding = '';
-    let demolitionMode = false;
-    let turn = 1;
-    let score = 0;
-    let totalProfit = 0;
-    let totalUpkeep = 0;
-    let consecutiveLosingTurns = 0;
-    let previousProfit = 0;
-
-    const upkeepCosts = {
-        residential: 1,
-        industry: 1,
-        commercial: 2,
-        park: 1,
-        road: 1
-    };
-
-    const earningRates = {
-        residential: 1,
-        industry: 2,
-        commercial: 3,
-        park: 0,
-        road: 0
-    };
 
     let grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
 
@@ -318,8 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gameState', JSON.stringify(gameState));
     });
 
+    // CHANGED: Updated loadGameState function to properly load FreePlay mode state
     function loadGameState() {
-        const gameState = localStorage.getItem('gameState');
+        const gameState = sessionStorage.getItem('loadedGameState'); // CHANGED: Using sessionStorage to load game state
         if (!gameState) return;
 
         const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, consecutiveLosingTurns: savedConsecutiveLosingTurns, previousProfit: savedPreviousProfit, grid: savedGrid, cells: savedCells } = JSON.parse(gameState);
