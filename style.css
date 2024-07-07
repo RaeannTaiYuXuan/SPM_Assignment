@@ -36,6 +36,49 @@ body {
     flex: 1;
     text-align: center;
 }
+/* RULES */
+.sidebar {
+    overflow-y: auto;
+    height: 100%;
+    width:450px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    color: white;
+}
+
+.sidebar-content {
+    padding: 20px;
+}
+
+.closebtn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    color:white;
+}
+
+.right-content {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.openbtn {
+    cursor: pointer;
+    font-size: 30px;
+}
+.sidebar ul{
+    line-height: 30px;
+}
 
 /* Additional styles for the top-bar content */
 .top-bar .left-content, .top-bar .center-content, .top-bar .right-content {

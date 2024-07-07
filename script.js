@@ -44,6 +44,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
 
+    // SIDE BAR :
+     function openNav() {
+        document.getElementById("mySidebar").style.width = "450px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+    }
+    document.querySelector('.openbtn').addEventListener('click', openNav);
+    document.querySelector('.closebtn').addEventListener('click', closeNav);
+
     function createGrid(size) {
         cityGrid.innerHTML = '';
         for (let i = 0; i < size * size; i++) {
@@ -387,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        totalUpkeep += upkeepCost;
+        totalUpkeep = upkeepCost;
         score -= upkeepCost;
 
         if (totalProfit === previousProfit) {
@@ -451,42 +462,189 @@ document.addEventListener('DOMContentLoaded', () => {
         return connectedCells;
     }
 
-    function getRoadOrientation(row, col) {
-        const directions = {
-            horizontal: [[0, -1], [0, 1]],
-            vertical: [[-1, 0], [1, 0]]
-        };
+    // function getRoadOrientation(row, col) {
+    //     const directions = {
+    //         horizontal: [[0, -1], [0, 1]],
+    //         vertical: [[-1, 0], [1, 0]]
+    //     };
         
-        let isHorizontal = false;
-        let isVertical = false;
+    //     let isHorizontal = false;
+    //     let isVertical = false;
         
-        directions.horizontal.forEach(([dx, dy]) => {
-            const newRow = row + dx;
-            const newCol = col + dy;
-            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
-                isHorizontal = true;
-            }
-        });
+    //     directions.horizontal.forEach(([dx, dy]) => {
+    //         const newRow = row + dx;
+    //         const newCol = col + dy;
+    //         if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
+    //             isHorizontal = true;
+    //         }
+    //     });
         
-        directions.vertical.forEach(([dx, dy]) => {
-            const newRow = row + dx;
-            const newCol = col + dy;
-            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
-                isVertical = true;
-            }
-        });
+    //     directions.vertical.forEach(([dx, dy]) => {
+    //         const newRow = row + dx;
+    //         const newCol = col + dy;
+    //         if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
+    //             isVertical = true;
+    //         }
+    //     });
         
-        if (isHorizontal && isVertical) {
-            return 'both';
-        } else if (isHorizontal) {
-            return 'horizontal';
-        } else if (isVertical) {
-            return 'vertical';
-        } else {
-            return 'none';
-        }
-    }
+    //     if (isHorizontal && isVertical) {
+    //         return 'both';
+    //     } else if (isHorizontal) {
+    //         return 'horizontal';
+    //     } else if (isVertical) {
+    //         return 'vertical';
+    //     } else {
+    //         return 'none';
+    //     }
+    // }
 
+    // function updateCellIcon(cell, buildingType, row, col) {
+    //     let icon;
+    //     switch (buildingType) {
+    //         case 'residential':
+    //             icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
+    //             break;
+    //         case 'industry':
+    //             icon = createGifIcon("icons8-industrial.gif", 40, 40); // Resized to 30x30;
+    //             break;
+    //         case 'commercial':
+    //             icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
+    //             break;
+    //         case 'park':
+    //             icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
+    //             break;
+    //         case 'road':
+    //             const orientation = getRoadOrientation(row, col);
+    //             if (orientation === 'horizontal') {
+    //                 icon = createImage("road_horizontal.png", "road-horizontal-animation");
+    //             } else if (orientation === 'vertical') {
+    //                 icon = createImage("road.png", "road-vertical-animation");
+    //             } else {
+    //                 icon = createImage("road.png", "road-default-animation");
+    //             }
+    //             break;
+    //         default:
+    //             return;
+    //     }
+    //     cell.innerHTML = '';
+    //     cell.appendChild(icon);
+    // }
+    
+    // function updateCellIcon(cell, buildingType, row, col) {
+    //     let icon;
+    //     const orientation = ifHorizontal(row,col,gridSize);
+    //     console.log('ROW + COL',row,col);
+    //     switch (buildingType) {
+    //         case 'residential':
+    //             icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
+    //             break;
+    //         case 'industry':
+    //             icon = createGifIcon("icons8-industrial.gif", 40, 40);
+    //             break;
+    //         case 'commercial':
+    //             icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
+    //             break;
+    //         case 'park':
+    //             icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
+    //             break;
+    //         case 'road':
+    //             console.log('ORIENTATION:',orientation);
+    //             if (orientation === 'horizontal') {
+    //                 icon = createImage("road_horizontal.png", "road-horizontal-animation");
+    //             } else if (row === 0 && col === 0) {
+    //                 icon = createImage("road_top_left.png", "road-top-left-animation");
+    //             } else if (row === gridSize - 1 && col === 0) {
+    //                 icon = createImage("road_bottom_left.png", "road-bottom-left-animation");
+    //             } else if (row === 0 && col === gridSize-1){
+    //                 icon = createImage("road_top_right.png", "road-top-right-animation");
+    //             } else if (row === gridSize-1 && row === gridSize-1){
+    //                 icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
+    //             }
+    //             else {
+    //                 icon = createImage("road.png", "road-default-animation");
+    //             }
+    //             break;
+    //     }
+    
+    //     cell.innerHTML = '';
+    //     cell.appendChild(icon);
+    // }
+    
+    function roadOrientation(row, col, gridSize) {
+        console.log('ROAD ORIENTATION:', row, col);
+        const middleValue = Math.floor(gridSize / 2) + 1;
+        const horizontalValues = [];
+    
+        // Define corner values: row, column
+        let cornerValues = {
+            'topLeftCorner': [0, 0],
+            'bottomLeftCorner': [gridSize - 1, 0],
+            'topRightCorner': [0, gridSize - 1],
+            'bottomRightCorner': [gridSize - 1, gridSize - 1]
+        };
+        let innerboxes = [];
+        innerboxes.push(cornerValues);
+    
+        // Propagating all the corner values of inner boxes
+        // Total no of boxes: middleValue - 1
+        let count = 0;
+        while (count < middleValue - 1) {
+            count++;
+            let newCornerValues = {
+                'topLeftCorner': [innerboxes[count - 1]['topLeftCorner'][0] + 1, innerboxes[count - 1]['topLeftCorner'][1] + 1],
+                'bottomLeftCorner': [innerboxes[count - 1]['bottomLeftCorner'][0] - 1, innerboxes[count - 1]['bottomLeftCorner'][1] + 1],
+                'topRightCorner': [innerboxes[count - 1]['topRightCorner'][0] + 1, innerboxes[count - 1]['topRightCorner'][1] - 1],
+                'bottomRightCorner': [innerboxes[count - 1]['bottomRightCorner'][0] - 1, innerboxes[count - 1]['bottomRightCorner'][1] - 1]
+            };
+            innerboxes.push(newCornerValues);
+        }
+        // GET HORIZONTAL VALUES
+        let countHorizontal = 0;
+        let startValue = 1;
+        let endValue = gridSize;
+
+        while (countHorizontal< middleValue-1){
+            let colValues = [];
+            for(let i = startValue; i<endValue;i++){
+                colValues.push(i);
+            }
+            let match = {};
+            match[countHorizontal] = colValues;
+            countHorizontal++;
+            startValue++;
+            endValue--;
+            horizontalValues.push(match);
+        }
+
+        if (row === middleValue - 1 && col === middleValue - 1) {
+            return 'default';
+        } 
+        if (innerboxes.length > 0) {
+            let placement = [row, col];
+            for (const box of innerboxes) {
+                for (const [key, value] of Object.entries(box)) {
+                    if (placement[0] === value[0] && placement[1] === value[1]) {
+                        return key;
+                    }
+                }
+            }
+        } 
+        if (horizontalValues.length > 0) {
+            console.log('ROW', row, col);
+            for (const horizontalRow of horizontalValues) {
+                for (const [key, value] of Object.entries(horizontalRow)) {
+                    console.log('Key:', key, 'Value:', value);
+                    if (row === parseInt(key) && value.includes(col)) {
+                        return 'horizontal';
+                    }
+                }
+            }
+        }
+        
+        
+        return 'none';
+    }
+    
     function updateCellIcon(cell, buildingType, row, col) {
         let icon;
         switch (buildingType) {
@@ -494,7 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
                 break;
             case 'industry':
-                icon = createGifIcon("icons8-industrial.gif", 40, 40); // Resized to 30x30;
+                icon = createGifIcon("icons8-industrial.gif", 40, 40);
                 break;
             case 'commercial':
                 icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
@@ -503,22 +661,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
                 break;
             case 'road':
-                const orientation = getRoadOrientation(row, col);
+                const orientation = roadOrientation(row, col, gridSize);
+                console.log('ORIENTATION:', orientation);
                 if (orientation === 'horizontal') {
                     icon = createImage("road_horizontal.png", "road-horizontal-animation");
-                } else if (orientation === 'vertical') {
-                    icon = createImage("road.png", "road-vertical-animation");
-                } else {
+                } else if (orientation === 'topLeftCorner') {
+                    icon = createImage("road_top_left.png", "road-top-left-animation");
+                } else if (orientation === 'bottomLeftCorner') {
+                    icon = createImage("road_bottom_left.png", "road-bottom-left-animation");
+                } else if (orientation === 'topRightCorner') {
+                    icon = createImage("road_top_right.png", "road-top-right-animation");
+                } else if (orientation === 'bottomRightCorner') {
+                    icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
+                }else if (orientation === 'none'){
+                    icon = createImage("road.png", "road-default-animation");
+                } 
+                else {
                     icon = createImage("road.png", "road-default-animation");
                 }
                 break;
-            default:
-                return;
         }
+    
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
-    
+
     function createImage(src, animationClass) {
         const img = document.createElement('img');
         img.src = src;
@@ -575,7 +742,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const newIndex = (row + offset) * gridSize + (col + offset);
                     newCells[newIndex].classList.add(oldGrid[row][col]);
                     newCells[newIndex].classList.add('cell-arcade');
-                    updateCellIcon(newCells[newIndex], oldGrid[row][col]);
+                    console.log('COMES TO EXPANSION');
+                    updateCellIcon(newCells[newIndex], oldGrid[row][col],row,col);
                     grid[row + offset][col + offset] = oldGrid[row][col];
                 }
             }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>City Building Game</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="top-bar">
@@ -14,7 +15,10 @@
             Profit: <span id="profitDisplay">0</span> | 
             Upkeep: <span id="upkeepDisplay">0</span> 
         </div>
-        <div class="right-content"><a href="index.html">Back to Home</a></div>
+        <a href="index.html">Back to Home</a>
+        <div class="right-content">
+            <i class="fa-solid fa-gamepad openbtn" onclick="openNav()"></i>
+        </div>   
     </div>
     <div class="game-container" id="gameContainer">
         <div class="city-grid" id="cityGrid"></div>
@@ -49,6 +53,45 @@
             <button id="resetButton" class="reset-button">Reset</button>
             <button id="demolishButton" class="demolish-button">Demolish</button>
             <button id="saveButton" class="save-button">Save Game</button>
+        </div>
+        <div class = "rules-container">
+            
+        </div>
+    </div>
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="sidebar-content">
+            <h2>Free Play Mode</h2>
+            <p><strong>Unlimited Coins</strong>: Build without worrying about running out of money.</p>
+            <p><strong>Starting Grid</strong>: Begin with a 5x5 grid.</p>
+            <h3>Gameplay:</h3>
+            <p><strong>Building</strong>: Construct any building on any cell. Each construction costs 1 coin.</p>
+            <p><strong>City Expansion</strong>: When you build along the border, the city expands by 5 rows and columns.</p>
+            <ul>
+                <li>1st Expansion: 15x15 grid</li>
+                <li>2nd Expansion: 25x25 grid</li>
+                <li>etc</li>
+            </ul>
+            <h3>Adjacency:</h3>
+            <p>Buildings are adjacent if connected by a road.</p>
+            <h3>Scoring:</h3>
+            <ul>
+                <li><strong>Residential (R)</strong>: If it is next to an industry (I), then it scores 1 point only. Otherwise, it scores 1 point for each adjacent residential (R) or commercial (C), and 2 points for each adjacent park (O).</li>
+                <li><strong>Industry (I)</strong>: Scores 1 point per industry in the city. Each industry generates 1 coin per residential building adjacent to it.</li>
+                <li><strong>Commercial (C)</strong>: Scores 1 point per commercial adjacent to it. Each commercial generates 1 coin per residential adjacent to it.</li>
+                <li><strong>Park (O)</strong>: Scores 1 point per park adjacent to it.</li>
+                <li><strong>Road (*)</strong>: Scores 1 point per connected road (*) in the same row.</li>
+            </ul>
+            <h3>Profit and Upkeep:</h3>
+            <ul>
+                <li><strong>Residential (R)</strong>: Generates 1 coin per turn. Cluster of residential buildings (adjacent to each other) requires 1 coin per turn to upkeep.</li>
+                <li><strong>Industry (I)</strong>: Generates 2 coins per turn. Costs 1 coin per turn to upkeep.</li>
+                <li><strong>Commercial (C)</strong>: Generates 3 coins per turn. Costs 2 coins per turn to upkeep.</li>
+                <li><strong>Park (O)</strong>: Costs 1 coin per turn to upkeep.</li>
+                <li><strong>Road (*)</strong>: Each unconnected road segment costs 1 coin per turn to upkeep.</li>
+            </ul>
+            <br><br>
         </div>
     </div>
     <script src="script.js"></script>

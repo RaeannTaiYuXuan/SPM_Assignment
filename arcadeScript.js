@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const coinsHTML = document.getElementById('coins');
     const scoreDisplay = document.getElementById('scoreDisplay');
+    const highScoreDisplay = document.getElementById('highScoreDisplay');
 
     let currentBuilding = '';
     let roundNo = 0;
@@ -57,6 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
             score: calculateScore() // Ensure score is saved correctly
         };
         localStorage.setItem(`arcadeGameState_${fileName}`, JSON.stringify(gameState));
+
+        // Save high score
+        saveHighScore(fileName, gameState.score);
+
         alert('Game Saved!');
     }
 
@@ -184,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentBuilding && (roundNo === 1 || isNextToExistingBuilding(row, col) || isDiagonalToExistingBuilding(row, col))) {
             cell.classList.remove('residential', 'industry', 'commercial', 'park', 'road');
             cell.classList.add(currentBuilding);
-            updateCellIcon(cell, currentBuilding);
+            updateCellIcon(cell, currentBuilding, row, col);
             grid[row][col] = currentBuilding;
             currentBuilding = '';
             startNewRound();
@@ -245,44 +250,81 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-
-   function getRoadOrientation(row, col) {
-        const directions = {
-            horizontal: [[0, -1], [0, 1]],
-            vertical: [[-1, 0], [1, 0]]
+    function roadOrientation(row, col, gridSize) {
+        console.log('ROAD ORIENTATION:', row, col);
+        const middleValue = Math.floor(gridSize / 2) + 1;
+        const horizontalValues = [];
+    
+        // Define corner values: row, column
+        let cornerValues = {
+            'topLeftCorner': [0, 0],
+            'bottomLeftCorner': [gridSize - 1, 0],
+            'topRightCorner': [0, gridSize - 1],
+            'bottomRightCorner': [gridSize - 1, gridSize - 1]
         };
-        
-        let isHorizontal = false;
-        let isVertical = false;
-        
-        directions.horizontal.forEach(([dx, dy]) => {
-            const newRow = row + dx;
-            const newCol = col + dy;
-            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
-                isHorizontal = true;
-            }
-        });
-        
-        directions.vertical.forEach(([dx, dy]) => {
-            const newRow = row + dx;
-            const newCol = col + dy;
-            if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
-                isVertical = true;
-            }
-        });
-        
-        if (isHorizontal && isVertical) {
-            return 'both';
-        } else if (isHorizontal) {
-            return 'horizontal';
-        } else if (isVertical) {
-            return 'vertical';
-        } else {
-            return 'none';
+        let innerboxes = [];
+        innerboxes.push(cornerValues);
+    
+        // Propagating all the corner values of inner boxes
+        // Total no of boxes: middleValue - 1
+        let count = 0;
+        while (count < middleValue - 1) {
+            count++;
+            let newCornerValues = {
+                'topLeftCorner': [innerboxes[count - 1]['topLeftCorner'][0] + 1, innerboxes[count - 1]['topLeftCorner'][1] + 1],
+                'bottomLeftCorner': [innerboxes[count - 1]['bottomLeftCorner'][0] - 1, innerboxes[count - 1]['bottomLeftCorner'][1] + 1],
+                'topRightCorner': [innerboxes[count - 1]['topRightCorner'][0] + 1, innerboxes[count - 1]['topRightCorner'][1] - 1],
+                'bottomRightCorner': [innerboxes[count - 1]['bottomRightCorner'][0] - 1, innerboxes[count - 1]['bottomRightCorner'][1] - 1]
+            };
+            innerboxes.push(newCornerValues);
         }
-    }
+        // GET HORIZONTAL VALUES
+        let countHorizontal = 0;
+        let startValue = 1;
+        let endValue = gridSize;
 
+        while (countHorizontal< middleValue-1){
+            let colValues = [];
+            for(let i = startValue; i<endValue;i++){
+                colValues.push(i);
+            }
+            let match = {};
+            match[countHorizontal] = colValues;
+            countHorizontal++;
+            startValue++;
+            endValue--;
+            horizontalValues.push(match);
+        }
+
+        if (row === middleValue - 1 && col === middleValue - 1) {
+            return 'default';
+        } 
+        if (innerboxes.length > 0) {
+            let placement = [row, col];
+            for (const box of innerboxes) {
+                for (const [key, value] of Object.entries(box)) {
+                    if (placement[0] === value[0] && placement[1] === value[1]) {
+                        return key;
+                    }
+                }
+            }
+        } 
+        if (horizontalValues.length > 0) {
+            console.log('ROW', row, col);
+            for (const horizontalRow of horizontalValues) {
+                for (const [key, value] of Object.entries(horizontalRow)) {
+                    console.log('Key:', key, 'Value:', value);
+                    if (row === parseInt(key) && value.includes(col)) {
+                        return 'horizontal';
+                    }
+                }
+            }
+        }
+        
+        
+        return 'none';
+    }
+    
     function updateCellIcon(cell, buildingType, row, col) {
         let icon;
         switch (buildingType) {
@@ -290,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
                 break;
             case 'industry':
-                icon = createGifIcon("icons8-industrial.gif", 25, 25); // Resized to 30x30;
+                icon = createGifIcon("icons8-industrial.gif", 28, 28);
                 break;
             case 'commercial':
                 icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
@@ -299,23 +341,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
                 break;
             case 'road':
-                const orientation = getRoadOrientation(row, col);
+                const orientation = roadOrientation(row, col, gridSize);
+                console.log('ORIENTATION:', orientation);
                 if (orientation === 'horizontal') {
                     icon = createImage("road_horizontal.png", "road-horizontal-animation");
-                } else if (orientation === 'vertical') {
-                    icon = createImage("road.png", "road-vertical-animation");
-                } else {
+                } else if (orientation === 'topLeftCorner') {
+                    icon = createImage("road_top_left.png", "road-top-left-animation");
+                } else if (orientation === 'bottomLeftCorner') {
+                    icon = createImage("road_bottom_left.png", "road-bottom-left-animation");
+                } else if (orientation === 'topRightCorner') {
+                    icon = createImage("road_top_right.png", "road-top-right-animation");
+                } else if (orientation === 'bottomRightCorner') {
+                    icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
+                }else if (orientation === 'none'){
+                    icon = createImage("road.png", "road-default-animation");
+                } 
+                else {
                     icon = createImage("road.png", "road-default-animation");
                 }
                 break;
-            default:
-                return;
         }
+    
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
-
-
+    
+    
+    
     function createImage(src, animationClass) {
         const img = document.createElement('img');
         img.src = src;
@@ -489,6 +541,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCoinsDisplay() {
         coinsHTML.textContent = `Coins: ${coins}`;
     }
+
+    function saveHighScore(name, score) {
+        const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+        highScores.push({ name, score });
+        highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
+        if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
+        localStorage.setItem('highScores', JSON.stringify(highScores));
+        updateHighScoreDisplay();
+    }
+
+    function getHighScores() {
+        return JSON.parse(localStorage.getItem('highScores')) || [];
+    }
+
+    function updateHighScoreDisplay() {
+        const highScores = getHighScores();
+        highScoreDisplay.innerHTML = highScores.map((score, index) => 
+            `<div>${index + 1}. ${score.name}: ${score.score}</div>`
+        ).join('');
+    }
+
+    // Initial load of high scores
+    updateHighScoreDisplay();
 
     loadGameState();
     if (!gameLoaded) {
