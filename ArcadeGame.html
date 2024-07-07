@@ -6,12 +6,16 @@
     <title>Arcade City Building Game</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.lordicon.com/lusqsztk.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="top-bar">
         <div class="left-content" id="coins">Coins: 16</div>
         <div class="center-content" id="scoreDisplay">Score: 0</div>
         <div class="right-content"><a href="index.html">Back to Home</a></div>
+        <div class="right-content">
+            <i class="fa-solid fa-gamepad openbtn" onclick="openNav()"></i>
+        </div>
     </div>
     <div class="game-container" id="gameContainer">
         <div class="city-grid-arcade" id="cityGridArcade"></div>
@@ -43,10 +47,27 @@
             <button id="saveButtonArcade" class="save-button">Save Game</button>
         </div>
     </div>
-    <div class="high-score-container">
-        <h2>High Scores</h2>
-        <div id="highScoreDisplay"></div>
+
+    <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="sidebar-content">
+            <h2>Arcade Mode</h2>
+            <p>In Arcade mode, this city-building game begins with 16 coins. In each turn, the player will construct one of two randomly selected buildings in the 20x20 city. Each construction costs 1 coin. For the first building, the player can build anywhere in the city. For subsequent constructions, the player can only build on squares that are connected to existing buildings. The other building that was not built is discarded.</p>
+            <h3>Gameplay:</h3>
+            <ul>
+                <li><strong>Residential (R)</strong>: If it is next to an industry (I), then it scores 1 point only. Otherwise, it scores 1 point for each adjacent residential (R) or commercial (C), and 2 points for each adjacent park (O).</li>
+                <li><strong>Industry (I)</strong>: Scores 1 point per industry in the city. Each industry generates 1 coin per residential building adjacent to it.</li>
+                <li><strong>Commercial (C)</strong>: Scores 1 point per commercial adjacent to it. Each commercial generates 1 coin per residential adjacent to it.</li>
+                <li><strong>Park (O)</strong>: Scores 1 point per park adjacent to it.</li>
+                <li><strong>Road (*)</strong>: Scores 1 point per connected road (*) in the same row.</li>
+            </ul>
+            <h3 style="margin-top: 20px;">Objective:</h3>
+            <p style="margin-bottom: 100px;">The objective of the game is to build a city that scores as many points as possible.</p>
+            
+        </div>
     </div>
+
     <script src="arcadeScript.js"></script>
 </body>
 </html>
