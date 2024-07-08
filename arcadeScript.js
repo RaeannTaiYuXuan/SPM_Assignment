@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roundNo = savedRoundNo;
         grid = savedGrid;
         gameLoaded = true; // Indicate that the game has been loaded
+            cells[index].className = 'cell-arcade';
         loadedGameName = sessionStorage.getItem('loadedGameName');  // CHANGED HERE: Store the loaded game name
 
         const cells = document.querySelectorAll('.cell-arcade');
@@ -192,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleBuildingClick(event) {
         const building = event.currentTarget.id.replace('Button', '');
         currentBuilding = building;
+        demolitionMode = false; // Disable demolition mode when a building button is clicked
     }
 
     function handleCellClick(cell, index, event) {
@@ -345,8 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        
-        
         return 'none';
     }
     
@@ -367,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'road':
                 const orientation = roadOrientation(row, col, gridSize);
-                console.log('ORIENTATION:', orientation);
                 if (orientation === 'horizontal') {
                     icon = createImage("road_horizontal.png", "road-horizontal-animation");
                 } else if (orientation === 'topLeftCorner') {
@@ -378,10 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon = createImage("road_top_right.png", "road-top-right-animation");
                 } else if (orientation === 'bottomRightCorner') {
                     icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
-                }else if (orientation === 'none'){
+                } else if (orientation === 'none'){
                     icon = createImage("road.png", "road-default-animation");
-                } 
-                else {
+                } else {
                     icon = createImage("road.png", "road-default-animation");
                 }
                 break;
@@ -390,8 +388,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
-    
-    
     
     function createImage(src, animationClass) {
         const img = document.createElement('img');
@@ -404,7 +400,6 @@ document.addEventListener('DOMContentLoaded', () => {
         img.style.height = '100%'; // Adjusting the size to fit the cell
         return img;
     }
-    
 
     function createLordicon(src) {
         const icon = document.createElement('lord-icon');
@@ -558,6 +553,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     demolishButton.addEventListener('click', demolishBuilding);
 
+    function isOccupied(cell) {
+        return ['residential', 'industry', 'commercial', 'park', 'road'].some(cls => cell.classList.contains(cls));
+    }
+
     function updateScoreDisplay() {
         const score = calculateScore();
         scoreDisplay.textContent = `Score: ${score}`;
@@ -573,10 +572,6 @@ document.addEventListener('DOMContentLoaded', () => {
         highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
         if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
         localStorage.setItem('highScores', JSON.stringify(highScores));
-    }
-
-    function getHighScores() {
-        return JSON.parse(localStorage.getItem('highScores')) || [];
     }
 
     loadGameState();
