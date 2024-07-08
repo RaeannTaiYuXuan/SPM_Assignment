@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < size * size; i++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
-            if (size === 15) {
+            if (size > 5) {
                 cell.classList.add('cell-arcade');
             }
             cell.dataset.index = i;
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cityGrid.appendChild(cell);
         }
         cityGrid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-        if (size === 15) {
+        if (size > 5) {
             cityGrid.classList.add('city-grid-arcade');
         } else {
             cityGrid.classList.remove('city-grid-arcade');
@@ -87,18 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const col = index % size;
         return row === 0 || row === size - 1 || col === 0 || col === size - 1;
     }
-
-    // function allBordersFilled(size) {
-    //     for (let i = 0; i < size; i++) {
-    //         if (!isOccupied(document.querySelector(`.cell[data-index="${i}"]`)) ||
-    //             !isOccupied(document.querySelector(`.cell[data-index="${size * (size - 1) + i}"]`)) ||
-    //             !isOccupied(document.querySelector(`.cell[data-index="${i * size}"]`)) ||
-    //             !isOccupied(document.querySelector(`.cell[data-index="${i * size + size - 1}"]`))) {
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
 
     function isOccupied(cell) {
         return cell.classList.contains('residential') ||
@@ -134,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDisplays();
     
             if (isBorderCell(index, gridSize)) {
-                expandTo15x15();
+                expandGrid();
             }
             currentBuilding = '';
             processTurn();
@@ -142,9 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Select a building first.');
         }
     }
-    
- 
-    
 
     function calculateCoinEarnings(buildingType) {
         return earningRates[buildingType];
@@ -371,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplays();
         updateTurnDisplay();
 
-        if (gridSize === 15) {
+        if (gridSize > 5) {
             document.body.classList.add('grid-expanded');
             document.querySelector('.toolbar').classList.add('toolbar-small');
         }
@@ -493,120 +478,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return connectedCells;
     }
 
-    // function getRoadOrientation(row, col) {
-    //     const directions = {
-    //         horizontal: [[0, -1], [0, 1]],
-    //         vertical: [[-1, 0], [1, 0]]
-    //     };
-        
-    //     let isHorizontal = false;
-    //     let isVertical = false;
-        
-    //     directions.horizontal.forEach(([dx, dy]) => {
-    //         const newRow = row + dx;
-    //         const newCol = col + dy;
-    //         if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
-    //             isHorizontal = true;
-    //         }
-    //     });
-        
-    //     directions.vertical.forEach(([dx, dy]) => {
-    //         const newRow = row + dx;
-    //         const newCol = col + dy;
-    //         if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize && grid[newRow][newCol] === 'road') {
-    //             isVertical = true;
-    //         }
-    //     });
-        
-    //     if (isHorizontal && isVertical) {
-    //         return 'both';
-    //     } else if (isHorizontal) {
-    //         return 'horizontal';
-    //     } else if (isVertical) {
-    //         return 'vertical';
-    //     } else {
-    //         return 'none';
-    //     }
-    // }
-
-    // function updateCellIcon(cell, buildingType, row, col) {
-    //     let icon;
-    //     switch (buildingType) {
-    //         case 'residential':
-    //             icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
-    //             break;
-    //         case 'industry':
-    //             icon = createGifIcon("icons8-industrial.gif", 40, 40); // Resized to 30x30;
-    //             break;
-    //         case 'commercial':
-    //             icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
-    //             break;
-    //         case 'park':
-    //             icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
-    //             break;
-    //         case 'road':
-    //             const orientation = getRoadOrientation(row, col);
-    //             if (orientation === 'horizontal') {
-    //                 icon = createImage("road_horizontal.png", "road-horizontal-animation");
-    //             } else if (orientation === 'vertical') {
-    //                 icon = createImage("road.png", "road-vertical-animation");
-    //             } else {
-    //                 icon = createImage("road.png", "road-default-animation");
-    //             }
-    //             break;
-    //         default:
-    //             return;
-    //     }
-    //     cell.innerHTML = '';
-    //     cell.appendChild(icon);
-    // }
-    
-    // function updateCellIcon(cell, buildingType, row, col) {
-    //     let icon;
-    //     const orientation = ifHorizontal(row,col,gridSize);
-    //     console.log('ROW + COL',row,col);
-    //     switch (buildingType) {
-    //         case 'residential':
-    //             icon = createLordicon("https://cdn.lordicon.com/heexevev.json");
-    //             break;
-    //         case 'industry':
-    //             icon = createGifIcon("icons8-industrial.gif", 40, 40);
-    //             break;
-    //         case 'commercial':
-    //             icon = createLordicon("https://cdn.lordicon.com/qjxbmwvd.json");
-    //             break;
-    //         case 'park':
-    //             icon = createLordicon("https://cdn.lordicon.com/nbktuufg.json");
-    //             break;
-    //         case 'road':
-    //             console.log('ORIENTATION:',orientation);
-    //             if (orientation === 'horizontal') {
-    //                 icon = createImage("road_horizontal.png", "road-horizontal-animation");
-    //             } else if (row === 0 && col === 0) {
-    //                 icon = createImage("road_top_left.png", "road-top-left-animation");
-    //             } else if (row === gridSize - 1 && col === 0) {
-    //                 icon = createImage("road_bottom_left.png", "road-bottom-left-animation");
-    //             } else if (row === 0 && col === gridSize-1){
-    //                 icon = createImage("road_top_right.png", "road-top-right-animation");
-    //             } else if (row === gridSize-1 && row === gridSize-1){
-    //                 icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
-    //             }
-    //             else {
-    //                 icon = createImage("road.png", "road-default-animation");
-    //             }
-    //             break;
-    //     }
-    
-    //     cell.innerHTML = '';
-    //     cell.appendChild(icon);
-    // }
-    
     function roadOrientation(row, col, gridSize) {
-        console.log('ROAD ORIENTATION:', row, col);
         const middleValue = Math.floor(gridSize / 2) + 1;
         const horizontalValues = [];
     
-        // Define corner values: row, column
         let cornerValues = {
             'topLeftCorner': [0, 0],
             'bottomLeftCorner': [gridSize - 1, 0],
@@ -616,8 +491,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let innerboxes = [];
         innerboxes.push(cornerValues);
     
-        // Propagating all the corner values of inner boxes
-        // Total no of boxes: middleValue - 1
         let count = 0;
         while (count < middleValue - 1) {
             count++;
@@ -629,14 +502,14 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             innerboxes.push(newCornerValues);
         }
-        // GET HORIZONTAL VALUES
+
         let countHorizontal = 0;
         let startValue = 1;
         let endValue = gridSize;
 
-        while (countHorizontal< middleValue-1){
+        while (countHorizontal < middleValue - 1) {
             let colValues = [];
-            for(let i = startValue; i<endValue;i++){
+            for (let i = startValue; i < endValue; i++) {
                 colValues.push(i);
             }
             let match = {};
@@ -661,18 +534,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } 
         if (horizontalValues.length > 0) {
-            console.log('ROW', row, col);
             for (const horizontalRow of horizontalValues) {
                 for (const [key, value] of Object.entries(horizontalRow)) {
-                    console.log('Key:', key, 'Value:', value);
                     if (row === parseInt(key) && value.includes(col)) {
                         return 'horizontal';
                     }
                 }
             }
         }
-        
-        
+
         return 'none';
     }
     
@@ -693,7 +563,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'road':
                 const orientation = roadOrientation(row, col, gridSize);
-                console.log('ORIENTATION:', orientation);
                 if (orientation === 'horizontal') {
                     icon = createImage("road_horizontal.png", "road-horizontal-animation");
                 } else if (orientation === 'topLeftCorner') {
@@ -704,15 +573,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon = createImage("road_top_right.png", "road-top-right-animation");
                 } else if (orientation === 'bottomRightCorner') {
                     icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
-                }else if (orientation === 'none'){
+                } else if (orientation === 'none'){
                     icon = createImage("road.png", "road-default-animation");
-                } 
-                else {
+                } else {
                     icon = createImage("road.png", "road-default-animation");
                 }
                 break;
         }
-    
+
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
@@ -722,13 +590,13 @@ document.addEventListener('DOMContentLoaded', () => {
         img.src = src;
         img.classList.add('icon-image');
         if (animationClass) {
-            img.classList.add(animationClass); // Add the animation class
+            img.classList.add(animationClass);
         }
-        img.style.width = '100%'; // Adjusting the size to fit the cell
-        img.style.height = '100%'; // Adjusting the size to fit the cell
+        img.style.width = '100%';
+        img.style.height = '100%';
         return img;
     }
-    
+
     function createLordicon(src) {
         const icon = document.createElement('lord-icon');
         icon.src = src;
@@ -737,6 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.style.height = '40px';
         return icon;
     }
+
     function createGifIcon(src, width, height) {
         const icon = document.createElement('img');
         icon.src = src;
@@ -756,16 +625,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    function expandTo15x15() {
+    function expandGrid() {
         const oldGrid = grid;
         const oldCells = [...document.querySelectorAll('.cell')];
         const oldSize = gridSize;
-        gridSize = 15;
+        gridSize += 10; // Increase the grid size by 10
         createGrid(gridSize);
         const newCells = document.querySelectorAll('.cell');
-
+    
         const offset = Math.floor((gridSize - oldSize) / 2);
-
+    
         for (let row = 0; row < oldGrid.length; row++) {
             for (let col = 0; col < oldGrid[row].length; col++) {
                 if (oldGrid[row][col] !== null) {
@@ -773,15 +642,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     const newIndex = (row + offset) * gridSize + (col + offset);
                     newCells[newIndex].classList.add(oldGrid[row][col]);
                     newCells[newIndex].classList.add('cell-arcade');
-                    console.log('COMES TO EXPANSION');
-                    updateCellIcon(newCells[newIndex], oldGrid[row][col],row,col);
+                    updateCellIcon(newCells[newIndex], oldGrid[row][col], row, col);
                     grid[row + offset][col + offset] = oldGrid[row][col];
                 }
             }
         }
+    
+        // Adjust the CSS to make the screen smaller and the buttons lower
         document.body.classList.add('grid-expanded');
-        alert('Grid expanded to 15x15!');
+        cityGrid.style.transform = 'scale(0.75)'; // Scale down the grid
+        cityGrid.style.transformOrigin = 'center'; // Set the origin of scaling
+    
+        // Move button container lower
+        document.querySelector('.button-container').style.marginTop = '150px';
+        document.querySelector('.toolbar').style.marginTop = '100px';
+    
+        alert(`Grid expanded to ${gridSize}x${gridSize}!`);
     }
+    
 
     buildingButtons.residential.addEventListener('click', () => {
         currentBuilding = 'residential';
@@ -815,10 +693,17 @@ document.addEventListener('DOMContentLoaded', () => {
         createGrid(gridSize);
         updateDisplays();
         updateTurnDisplay();
-        
+    
+        // Remove the grid-expanded class and reset styles
         document.body.classList.remove('grid-expanded');
+        document.querySelector('.button-container').style.marginTop = '';
+        document.querySelector('.toolbar').style.marginTop = '';
+        cityGrid.style.transform = '';
+        cityGrid.style.transformOrigin = '';
+    
         document.querySelector('.toolbar').classList.remove('toolbar-small');
     });
+    
 
     updateDisplays();
     createGrid(gridSize);
