@@ -11,6 +11,14 @@ function preventBackNavigation() {
 
 preventBackNavigation(); // Call the function to prevent back navigation
 
+// Handle beforeunload event to prevent closing the tab or navigating away
+window.addEventListener('beforeunload', function (e) {
+    // Cancel the event as stated by the standard
+    e.preventDefault();
+    // Chrome requires returnValue to be set
+    e.returnValue = '';
+});
+
 document.querySelectorAll('.menuButton').forEach(button => {
     button.addEventListener('click', function () {
         if (this.textContent.trim() === 'Start Free Play Game') {
