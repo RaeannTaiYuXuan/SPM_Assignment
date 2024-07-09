@@ -20,12 +20,20 @@ const upkeepCosts = {
     road: 1
 };
 
-const earningRates = {
+const coinsGenerated = {
     residential: 1,
     industry: 2,
     commercial: 3,
     park: 0,
     road: 0
+}
+
+const earningRates = {
+    residential: coinsGenerated.residential - upkeepCosts.residential,
+    industry: coinsGenerated.industry - upkeepCosts.industry,
+    commercial: coinsGenerated.commercial - upkeepCosts.commercial,
+    park: coinsGenerated.park - upkeepCosts.park,
+    road: coinsGenerated.road - upkeepCosts.road
 };
 
 document.addEventListener('DOMContentLoaded', () => {
