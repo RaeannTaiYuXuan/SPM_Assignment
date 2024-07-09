@@ -105,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function placeBuilding(cell, index) {
-        const buildingCost = 1;
         const row = Math.floor(index / gridSize);
         const col = index % gridSize;
     
@@ -118,19 +117,46 @@ document.addEventListener('DOMContentLoaded', () => {
     
             const earning = calculateCoinEarnings(currentBuilding);
             totalProfit += earning;
-            score += earning - buildingCost;
+    
+            // Calculate score after placing the building and add to saved score
+            score += calculateScore();
+    
+            console.log('Score after placing building:', score); // Debugging log
+    
             updateDisplays();
     
             if (isBorderCell(index, gridSize)) {
+                // Temporarily store the current state of buildings
+                const currentBuildings = [];
+                for (let i = 0; i < gridSize; i++) {
+                    for (let j = 0; j < gridSize; j++) {
+                        if (grid[i][j] !== null) {
+                            currentBuildings.push({ row: i, col: j, type: grid[i][j] });
+                        }
+                    }
+                }
+    
                 expandGrid();
+    
+                // Re-apply the buildings to the new expanded grid
+                for (const building of currentBuildings) {
+                    const newRow = building.row + 5; // Adjust the offset according to the expandGrid logic
+                    const newCol = building.col + 5; // Adjust the offset according to the expandGrid logic
+                    const newIndex = newRow * gridSize + newCol;
+                    const newCell = document.querySelector(`.cell[data-index="${newIndex}"]`);
+                    newCell.classList.add(building.type);
+                    updateCellIcon(newCell, building.type, newRow, newCol);
+                    grid[newRow][newCol] = building.type;
+                }
             }
+    
             currentBuilding = '';
             processTurn();
         } else {
             alert('Select a building first.');
         }
     }
-
+                    
     function calculateCoinEarnings(buildingType) {
         return earningRates[buildingType];
     }
@@ -138,9 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateDisplays() {
         profitDisplay.textContent = totalProfit;
         upkeepDisplay.textContent = totalUpkeep;
-        scoreDisplay.textContent = calculateScore();
+        scoreDisplay.textContent = score; // Ensure this uses the score variable directly
         updateTurnDisplay();
+    
+        console.log('Displayed Score:', score); // Debugging log
     }
+    
+    
+    
 
     function updateTurnDisplay() {
         turnDisplay.textContent = turn;
@@ -256,12 +287,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveGame() {
-        // If it's a loaded game, save with the existing name and alert the user
         if (isLoadedGame) {
             const gameState = {
                 pageType: 'FreePlay',
                 gridSize: gridSize,
-                score: score,
+                score: score, // Save the current score
                 turn: turn,
                 totalProfit: totalProfit,
                 totalUpkeep: totalUpkeep,
@@ -277,13 +307,13 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Game saved!');
             return;
         }
-
+    
         const fileName = prompt("Enter a name for your save game:");
         if (fileName === null || fileName.trim() === '') {
             alert('Save cancelled or invalid name entered.');
             return;
         }
-
+    
         const existingGameNames = Object.keys(localStorage)
             .filter(key => key.startsWith('gameState_'))
             .map(key => key.replace('gameState_', ''));
@@ -291,11 +321,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('A game with this name already exists. Please choose a different name.');
             return;
         }
-
+    
         const gameState = {
             pageType: 'FreePlay',
             gridSize: gridSize,
-            score: score,
+            score: score, // Save the current score
             turn: turn,
             totalProfit: totalProfit,
             totalUpkeep: totalUpkeep,
@@ -310,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem(`gameState_${fileName}`, JSON.stringify(gameState));
         alert('Game Saved!');
     }
-
+        
     window.addEventListener('beforeunload', () => {
         const gameState = {
             gridSize: gridSize,
@@ -331,13 +361,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // CHANGED: Updated loadGameState function to properly load FreePlay mode state
     function loadGameState() {
-        const gameState = sessionStorage.getItem('loadedGameState'); // CHANGED: Using sessionStorage to load game state
+        const gameState = sessionStorage.getItem('loadedGameState');
         if (!gameState) return;
-
+    
         const { gridSize: savedGridSize, score: savedScore, turn: savedTurn, totalProfit: savedProfit, totalUpkeep: savedUpkeep, consecutiveLosingTurns: savedConsecutiveLosingTurns, previousProfit: savedPreviousProfit, grid: savedGrid, cells: savedCells } = JSON.parse(gameState);
-
+    
+        console.log('Loaded Score:', savedScore); // Debugging log
+    
         gridSize = savedGridSize;
-        score = savedScore;
+        score += savedScore; // Add saved score to the current score
         turn = savedTurn;
         totalProfit = savedProfit;
         totalUpkeep = savedUpkeep;
@@ -345,27 +377,26 @@ document.addEventListener('DOMContentLoaded', () => {
         previousProfit = savedPreviousProfit;
         grid = savedGrid;
         createGrid(gridSize);
-
+    
         const cells = document.querySelectorAll('.cell');
         savedCells.forEach((savedCell, index) => {
             cells[index].className = 'cell';
             savedCell.classes.forEach(cls => cells[index].classList.add(cls));
             cells[index].innerHTML = savedCell.innerHTML;
         });
-
-        updateDisplays();
+    
+        updateDisplays(); // Ensure displays are updated after loading the game state
         updateTurnDisplay();
-
+    
         if (gridSize > 5) {
             document.body.classList.add('grid-expanded');
             document.querySelector('.toolbar').classList.add('toolbar-small');
         }
-
-        // CHANGED: Mark the game as loaded and set the loaded game name
+    
         isLoadedGame = true;
         loadedGameName = sessionStorage.getItem('loadedGameName') || '';
     }
-
+                                    
     saveButton.addEventListener('click', saveGame);
 
     function demolishBuilding() {
@@ -397,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function processTurn() {
         let upkeepCost = 0;
         const visited = new Set();
-
+    
         for (let row = 0; row < gridSize; row++) {
             for (let col = 0; col < gridSize; col++) {
                 const buildingType = grid[row][col];
@@ -413,28 +444,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-
+    
         totalUpkeep = upkeepCost;
+    
+        // Log the current score and upkeep cost for debugging
+        console.log('Current Score before upkeep:', score);
+        console.log('Upkeep Cost:', upkeepCost);
+    
+        // Deduct upkeep cost from score
         score -= upkeepCost;
-
+    
+        // Ensure score does not go below 1
+        if (score < 1) {
+            score = 1;
+        }
+    
+        console.log('Score after upkeep deduction:', score);
+    
         if (totalProfit === previousProfit) {
             consecutiveLosingTurns++;
         } else {
             consecutiveLosingTurns = 0;
         }
         previousProfit = totalProfit;
-
+    
         if (consecutiveLosingTurns >= 20) {
             alert('Game Over: The city has been making a loss for 20 consecutive turns.');
             resetGame();
         }
-
+    
+        // Recalculate the score after processing the turn
+        score += calculateScore();
+    
         updateDisplays();
-        
+    
         turn++;
         updateTurnDisplay();
+    
+        console.log('Score after processing turn:', score);
     }
-
+                            
     function resetGame() {
         gridSize = 5;
         turn = 1;
@@ -712,4 +761,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sessionStorage.getItem('loadedGameState')) {
         loadGameState();
     }
+    
 });
