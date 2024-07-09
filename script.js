@@ -145,7 +145,7 @@ const earningRates = {
             totalProfit += earning;
     
             // Calculate score after placing the building and add to saved score
-            score += calculateScore();
+            score = calculateScore(); // Recalculate score
     
             console.log('Score after placing building:', score); // Debugging log
     
@@ -182,7 +182,7 @@ const earningRates = {
             alert('Select a building first.');
         }
     }
-                    
+                        
     function calculateCoinEarnings(buildingType) {
         return earningRates[buildingType];
     }
@@ -499,8 +499,8 @@ const earningRates = {
             resetGame();
         }
     
-        // Recalculate the score after processing the turn
-        score += calculateScore();
+        // Recalculate the score based on the current state of the grid
+        score = calculateScore();
     
         updateDisplays();
     
@@ -509,7 +509,7 @@ const earningRates = {
     
         console.log('Score after processing turn:', score);
     }
-                            
+                                
     function resetGame() {
         gridSize = 5;
         turn = 1;
