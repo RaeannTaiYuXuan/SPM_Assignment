@@ -1,3 +1,25 @@
+// Function to prevent back navigation
+function preventBackNavigation() {
+    // Push a new state to the history stack
+    history.pushState(null, null, location.href);
+    // Listen for popstate event
+    window.addEventListener('popstate', function(event) {
+        // Push a new state to prevent back navigation
+        history.pushState(null, null, location.href);
+    });
+}
+
+preventBackNavigation(); // Call the function to prevent back navigation
+
+// Handle beforeunload event to prevent closing the tab or navigating away
+window.addEventListener('beforeunload', function (e) {
+    // Cancel the event as stated by the standard
+    e.preventDefault();
+    // Chrome requires returnValue to be set
+    e.returnValue = '';
+});
+
+
 document.querySelectorAll('.menuButton').forEach(button => {
     button.addEventListener('click', function () {
         if (this.textContent.trim() === 'Start Free Play Game') {
@@ -43,20 +65,8 @@ function populateHighScores() {
         highScoresTableBody.appendChild(row);
     }
 }
-// function exitGame() {
-//     // Show a confirmation dialog
-//     const confirmation = confirm("Are you sure you want to exit the game?");
-//     if (confirmation) {
-//         // Redirect to a blank page
-//         window.location.href = "about:blank";
-//         // Attempt to close after a short delay (e.g., 1 second)
-//         setTimeout(() => {
-//             window.close();
-//         }, 1000);
-//     }
-// }
 
-// Populate the saved games dropdown (dummy data for demonstration)
+// Populate the saved games dropdown
 function populateSavedGames() {
     const savedGames = Object.keys(localStorage)
         .filter(key => key.startsWith('arcadeGameState_') || key.startsWith('gameState_'))
@@ -91,7 +101,7 @@ function loadSavedGame() {
     const gameState = localStorage.getItem(selectedGameKey);
     if (gameState) {
         sessionStorage.setItem('loadedGameState', gameState);
-        sessionStorage.setItem('loadedGameName', selectedGameKey.replace('arcadeGameState_', ''));  // CHANGED HERE: Store the loaded game name
+        sessionStorage.setItem('loadedGameName', selectedGameKey.replace('arcadeGameState_', ''));  // Store the loaded game name
         const { pageType } = JSON.parse(gameState);
         if (pageType === 'ArcadeGame') {
             location.href = 'ArcadeGame.html';
