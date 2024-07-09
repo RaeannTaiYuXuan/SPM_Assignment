@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Function to prevent back navigation
     function preventBackNavigation() {
-        // Push a new state to the history stack
-        history.pushState(null, null, location.href);
         // Listen for popstate event
         window.addEventListener('popstate', function(event) {
             // Push a new state to prevent back navigation

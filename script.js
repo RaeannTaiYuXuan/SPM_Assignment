@@ -1,3 +1,23 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // Function to prevent back navigation
+    function preventBackNavigation() {
+       // Push a new state to the history stack
+       history.pushState(null, null, location.href);
+       // Listen for popstate event
+       window.addEventListener('popstate', function(event) {
+           // Push a new state to prevent back navigation
+           history.pushState(null, null, location.href);
+       });
+   }
+preventBackNavigation(); // Call the function to prevent back navigation
+
+// Handle beforeunload event to prevent closing the tab or navigating away
+window.addEventListener('beforeunload', function (e) {
+    // Cancel the event as stated by the standard
+    e.preventDefault();
+    // Chrome requires returnValue to be set
+    e.returnValue = '';
+});
 // Variables to track if the game was loaded and the game name
 let isLoadedGame = false;
 let loadedGameName = '';
@@ -35,29 +55,6 @@ const earningRates = {
     park: coinsGenerated.park - upkeepCosts.park,
     road: coinsGenerated.road - upkeepCosts.road
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-     // Function to prevent back navigation
-     function preventBackNavigation() {
-        // Push a new state to the history stack
-        history.pushState(null, null, location.href);
-        // Listen for popstate event
-        window.addEventListener('popstate', function(event) {
-            // Push a new state to prevent back navigation
-            history.pushState(null, null, location.href);
-        });
-    }
-
-    preventBackNavigation(); // Call the function to prevent back navigation
-
-    // Handle beforeunload event to prevent closing the tab or navigating away
-    window.addEventListener('beforeunload', function (e) {
-        // Cancel the event as stated by the standard
-        e.preventDefault();
-        // Chrome requires returnValue to be set
-        e.returnValue = '';
-    });
-    
     const cityGrid = document.getElementById('cityGrid');
     const resetButton = document.getElementById('resetButton');
     const saveButton = document.getElementById('saveButton');
