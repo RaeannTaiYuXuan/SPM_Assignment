@@ -143,12 +143,24 @@ const earningRates = {
     
             const earning = calculateCoinEarnings(currentBuilding);
             totalProfit += earning;
+
+            if (isLoadedGame){
+                if (currentBuilding == 'industry'){
+                    score += 1 
+                }
+                else{
+                    console.log('Scoreeee:', score);
+                    console.log('calculayted scoreeeee:', calculateScore());
+                    score += calculateScore(); 
+                    console.log('Score after placing building in a saved game:', score); // Debugging log    
+                }
+            }
     
-            // Calculate score after placing the building and add to saved score
-            score = calculateScore(); // Recalculate score
-    
-            console.log('Score after placing building:', score); // Debugging log
-    
+            else{
+                // Calculate score after placing the building and add to saved score
+                score = calculateScore(); // Recalculate score
+                console.log('Score after placing building:', score); // Debugging log
+            }        
             updateDisplays();
     
             if (isBorderCell(index, gridSize)) {
@@ -471,7 +483,17 @@ const earningRates = {
             }
         }
     
-        totalUpkeep = upkeepCost;
+        if (isLoadedGame){
+            console.log('Total upkeep in saved game:', totalUpkeep);
+            console.log('Upkeep cost in saved game:', upkeepCost);
+            totalUpkeep += upkeepCost;
+            console.log('Upkeep Cost in Saved Game:', upkeepCost);
+        }
+
+        else{
+            totalUpkeep = upkeepCost;
+            console.log('Upkeep Cost not in Saved Game:', upkeepCost);
+        }
     
         // Log the current score and upkeep cost for debugging
         console.log('Current Score before upkeep:', score);
@@ -500,7 +522,15 @@ const earningRates = {
         }
     
         // Recalculate the score based on the current state of the grid
-        score = calculateScore();
+        if (isLoadedGame){
+            score += calculateScore();
+            console.log("Saved game");
+        }
+
+        else{
+            score = calculateScore();
+            console.log("Not saved game");
+        }
     
         updateDisplays();
     
