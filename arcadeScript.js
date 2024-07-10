@@ -1,4 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Function to prevent back navigation
+    function preventBackNavigation() {
+        // Listen for popstate event
+        window.addEventListener('popstate', function(event) {
+            // Push a new state to prevent back navigation
+            history.pushState(null, null, location.href);
+        });
+    }
+
+    preventBackNavigation(); // Call the function to prevent back navigation
+
+    // Handle beforeunload event to prevent closing the tab or navigating away
+    window.addEventListener('beforeunload', function (e) {
+        // Cancel the event as stated by the standard
+        e.preventDefault();
+        // Chrome requires returnValue to be set
+        e.returnValue = '';
+    });
+
     const cityGridArcade = document.getElementById('cityGridArcade');
     const resetButtonArcade = document.getElementById('resetButtonArcade');
     const saveButtonArcade = document.getElementById('saveButtonArcade');
@@ -21,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let grid = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
     let demolitionMode = false;
     let gameLoaded = false;
+    let loadedGameName = null;  // CHANGED HERE: Store the loaded game name
 
     for (let i = 0; i < gridSize * gridSize; i++) {
         const cell = document.createElement('div');
@@ -32,37 +52,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveArcadeGame() {
-        const fileName = prompt("Enter a name for your save game:");
-        if (fileName === null || fileName.trim() === '') {
-            alert('Save cancelled or invalid name entered.');
-            return;
+        // CHANGED HERE: Check if the game was loaded
+        if (loadedGameName) {
+            // If the game is loaded and changes were made, save with the existing name
+            const gameState = {
+                pageType: 'ArcadeGame',
+                coins: coins,
+                roundNo: roundNo,
+                grid: grid,
+                cells: Array.from(document.querySelectorAll('.cell-arcade')).map(cell => ({
+                    classes: Array.from(cell.classList),
+                    innerHTML: cell.innerHTML
+                })),
+                score: calculateScore() // Ensure score is saved correctly
+            };
+            localStorage.setItem(`arcadeGameState_${loadedGameName}`, JSON.stringify(gameState));
+
+            // Save high score
+            saveHighScore(loadedGameName, gameState.score);
+
+            alert('Game Saved!');
+        } else {
+            const fileName = prompt("Enter a name for your save game:");
+            if (fileName === null || fileName.trim() === '') {
+                alert('Save cancelled or invalid name entered.');
+                return;
+            }
+
+            const existingGameNames = Object.keys(localStorage)
+                .filter(key => key.startsWith('arcadeGameState_'))
+                .map(key => key.replace('arcadeGameState_', ''));
+            if (existingGameNames.includes(fileName)) {
+                alert('A game with this name already exists. Please choose a different name.');
+                return;
+            }
+
+            const gameState = {
+                pageType: 'ArcadeGame',
+                coins: coins,
+                roundNo: roundNo,
+                grid: grid,
+                cells: Array.from(document.querySelectorAll('.cell-arcade')).map(cell => ({
+                    classes: Array.from(cell.classList),
+                    innerHTML: cell.innerHTML
+                })),
+                score: calculateScore() // Ensure score is saved correctly
+            };
+            localStorage.setItem(`arcadeGameState_${fileName}`, JSON.stringify(gameState));
+
+            // Save high score
+            saveHighScore(fileName, gameState.score);
+
+            alert('Game Saved!');
         }
-
-        const existingGameNames = Object.keys(localStorage)
-            .filter(key => key.startsWith('arcadeGameState_'))
-            .map(key => key.replace('arcadeGameState_', ''));
-        if (existingGameNames.includes(fileName)) {
-            alert('A game with this name already exists. Please choose a different name.');
-            return;
-        }
-
-        const gameState = {
-            pageType: 'ArcadeGame',
-            coins: coins,
-            roundNo: roundNo,
-            grid: grid,
-            cells: Array.from(document.querySelectorAll('.cell-arcade')).map(cell => ({
-                classes: Array.from(cell.classList),
-                innerHTML: cell.innerHTML
-            })),
-            score: calculateScore() // Ensure score is saved correctly
-        };
-        localStorage.setItem(`arcadeGameState_${fileName}`, JSON.stringify(gameState));
-
-        // Save high score
-        saveHighScore(fileName, gameState.score);
-
-        alert('Game Saved!');
     }
 
     saveButtonArcade.addEventListener('click', saveArcadeGame);
@@ -77,6 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
         roundNo = savedRoundNo;
         grid = savedGrid;
         gameLoaded = true; // Indicate that the game has been loaded
+            cells[index].className = 'cell-arcade';
+        loadedGameName = sessionStorage.getItem('loadedGameName');  // CHANGED HERE: Store the loaded game name
 
         const cells = document.querySelectorAll('.cell-arcade');
         savedCells.forEach((savedCell, index) => {
@@ -88,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         coinsHTML.textContent = `Coins: ${coins}`;
         scoreDisplay.textContent = `Score: ${savedScore}`;
         sessionStorage.removeItem('loadedGameState');
+        sessionStorage.removeItem('loadedGameName');  // CHANGED HERE: Remove the loaded game name from session storage
 
         updateScoreDisplay(); // Ensure score is updated correctly
         updateCoinsDisplay(); // Ensure coins are updated correctly
@@ -167,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleBuildingClick(event) {
         const building = event.currentTarget.id.replace('Button', '');
         currentBuilding = building;
+        demolitionMode = false; // Disable demolition mode when a building button is clicked
     }
 
     function handleCellClick(cell, index, event) {
@@ -320,8 +366,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        
-        
         return 'none';
     }
     
@@ -342,7 +386,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'road':
                 const orientation = roadOrientation(row, col, gridSize);
-                console.log('ORIENTATION:', orientation);
                 if (orientation === 'horizontal') {
                     icon = createImage("road_horizontal.png", "road-horizontal-animation");
                 } else if (orientation === 'topLeftCorner') {
@@ -353,10 +396,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon = createImage("road_top_right.png", "road-top-right-animation");
                 } else if (orientation === 'bottomRightCorner') {
                     icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
-                }else if (orientation === 'none'){
+                } else if (orientation === 'none'){
                     icon = createImage("road.png", "road-default-animation");
-                } 
-                else {
+                } else {
                     icon = createImage("road.png", "road-default-animation");
                 }
                 break;
@@ -365,8 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.innerHTML = '';
         cell.appendChild(icon);
     }
-    
-    
     
     function createImage(src, animationClass) {
         const img = document.createElement('img');
@@ -379,7 +419,6 @@ document.addEventListener('DOMContentLoaded', () => {
         img.style.height = '100%'; // Adjusting the size to fit the cell
         return img;
     }
-    
 
     function createLordicon(src) {
         const icon = document.createElement('lord-icon');
@@ -533,6 +572,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     demolishButton.addEventListener('click', demolishBuilding);
 
+    function isOccupied(cell) {
+        return ['residential', 'industry', 'commercial', 'park', 'road'].some(cls => cell.classList.contains(cls));
+    }
+
     function updateScoreDisplay() {
         const score = calculateScore();
         scoreDisplay.textContent = `Score: ${score}`;
@@ -548,10 +591,6 @@ document.addEventListener('DOMContentLoaded', () => {
         highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
         if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
         localStorage.setItem('highScores', JSON.stringify(highScores));
-    }
-
-    function getHighScores() {
-        return JSON.parse(localStorage.getItem('highScores')) || [];
     }
 
     loadGameState();
