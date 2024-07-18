@@ -42,18 +42,23 @@ function hideHighScoresOverlay() {
 
 // Populate the high scores table from local storage
 function populateHighScores() {
-    const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
-    const highScoresTableBody = document.querySelector('#highScoresTable tbody');
-    highScoresTableBody.innerHTML = '';
+    const arcadeHighScores = JSON.parse(localStorage.getItem('arcadeHighScores')) || [];
+    const freePlayHighScores = JSON.parse(localStorage.getItem('freePlayHighScores')) || [];
+    const arcadeHighScoresTableBody = document.querySelector('#arcadeHighScoresTable tbody');
+    const freePlayHighScoresTableBody = document.querySelector('#freePlayHighScoresTable tbody');
+    
+    arcadeHighScoresTableBody.innerHTML = '';
+    freePlayHighScoresTableBody.innerHTML = '';
 
+    // Populate Arcade High Scores
     for (let i = 0; i < 10; i++) {
         const row = document.createElement('tr');
         const playerNameCell = document.createElement('td');
         const playerScoreCell = document.createElement('td');
 
-        if (highScores[i]) {
-            playerNameCell.textContent = highScores[i].name;
-            playerScoreCell.textContent = highScores[i].score;
+        if (arcadeHighScores[i]) {
+            playerNameCell.textContent = arcadeHighScores[i].name;
+            playerScoreCell.textContent = arcadeHighScores[i].score;
         } else {
             playerNameCell.textContent = '-';
             playerScoreCell.textContent = '-';
@@ -61,7 +66,26 @@ function populateHighScores() {
 
         row.appendChild(playerNameCell);
         row.appendChild(playerScoreCell);
-        highScoresTableBody.appendChild(row);
+        arcadeHighScoresTableBody.appendChild(row);
+    }
+
+    // Populate Free Play High Scores
+    for (let i = 0; i < 10; i++) {
+        const row = document.createElement('tr');
+        const playerNameCell = document.createElement('td');
+        const playerScoreCell = document.createElement('td');
+
+        if (freePlayHighScores[i]) {
+            playerNameCell.textContent = freePlayHighScores[i].name;
+            playerScoreCell.textContent = freePlayHighScores[i].score;
+        } else {
+            playerNameCell.textContent = '-';
+            playerScoreCell.textContent = '-';
+        }
+
+        row.appendChild(playerNameCell);
+        row.appendChild(playerScoreCell);
+        freePlayHighScoresTableBody.appendChild(row);
     }
 }
 
@@ -100,7 +124,6 @@ function loadSavedGame() {
     const gameState = localStorage.getItem(selectedGameKey);
     if (gameState) {
         sessionStorage.setItem('loadedGameState', gameState);
-        sessionStorage.setItem('loadedGameName', selectedGameKey.replace('arcadeGameState_', ''));  // Store the loaded game name
         const { pageType } = JSON.parse(gameState);
         if (pageType === 'ArcadeGame') {
             location.href = 'ArcadeGame.html';

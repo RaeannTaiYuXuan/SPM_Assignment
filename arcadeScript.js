@@ -590,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
         highScores.push({ name, score });
         highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
         if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
-        localStorage.setItem('highScores', JSON.stringify(highScores));
+        localStorage.setItem('arcadeHighScores', JSON.stringify(highScores));
     }
 
     loadGameState();

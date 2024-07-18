@@ -110,27 +110,27 @@ body {
 
 #highScoresOverlay .overlay-content {
     background: #1a1a1a; /* Dark background to match theme */
-    padding: 40px;
+    padding: 15px; /* Adjust padding */
     border-radius: 15px; /* Rounded corners */
     text-align: center;
     color: #fff; /* White text for contrast */
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5); /* Softer shadow */
-    max-width: 600px;
-    width: 90%;
+    width: 80%; /* Adjust width percentage */
+    max-width: 1000px; /* Adjust maximum width */
     border: 2px solid #00FFFF; /* Border to match theme color */
 }
 
 #highScoresOverlay .overlay-content h2 {
     margin-top: 0;
-    font-size: 2.5em; /* Larger title */
+    font-size: 2em; /* Adjust title size */
     color: #00FFFF; /* Theme color for title */
-    margin-bottom: 20px; /* More space below title */
+    margin-bottom: 15px; /* Adjust space below title */
     font-family: 'Arial Black', sans-serif;
 }
 
 #highScoresOverlay .overlay-content table {
     width: 100%;
-    margin: 20px 0;
+    margin: 15px 0;
     border-collapse: collapse;
     border-radius: 10px; /* Rounded corners for table */
     overflow: hidden;
@@ -139,9 +139,9 @@ body {
 
 #highScoresOverlay .overlay-content th,
 #highScoresOverlay .overlay-content td {
-    padding: 15px; /* More padding for better spacing */
+    padding: 10px; /* Adjust padding */
     text-align: center; /* Center align text */
-    font-size: 1.2em; /* Larger font size */
+    font-size: 1em; /* Adjust font size */
     border-bottom: 1px solid #333; /* Border for rows */
 }
 
@@ -161,12 +161,12 @@ body {
 }
 
 #highScoresOverlay .overlay-content .btn {
-    padding: 15px 30px; /* More padding for buttons */
+    padding: 10px 20px; /* Adjust padding */
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 1.2em;
-    margin-top: 20px; /* Margin above the button */
+    font-size: 1em; /* Adjust font size */
+    margin-top: 15px; /* Adjust margin */
     background-color: #00FFFF; /* Vibrant button color */
     color: #000; /* Black text for button */
     transition: background-color 0.3s ease;
@@ -201,35 +201,35 @@ body {
 
 #loadGameOverlay .overlay-content {
     background: #1a1a1a; /* Dark background to match theme */
-    padding: 40px;
+    padding: 15px; /* Adjust padding */
     border-radius: 15px; /* Rounded corners */
     text-align: center;
     color: #fff; /* White text for contrast */
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5); /* Softer shadow */
-    max-width: 600px;
-    width: 90%;
+    width: 80%; /* Adjust width percentage */
+    max-width: 600px; /* Adjust maximum width */
     border: 2px solid #00FFFF; /* Border to match theme color */
 }
 
 #loadGameOverlay .overlay-content h2 {
     margin-top: 0;
-    font-size: 2.5em; /* Larger title */
+    font-size: 2em; /* Adjust title size */
     color: #00FFFF; /* Theme color for title */
-    margin-bottom: 20px; /* More space below title */
+    margin-bottom: 15px; /* Adjust space below title */
     font-family: 'Arial Black', sans-serif;
 }
 
 #loadGameOverlay .overlay-content label {
     display: block;
     margin-bottom: 10px;
-    font-size: 1.2em; /* Larger font size */
+    font-size: 1em; /* Adjust font size */
     color: #00FFFF; /* Theme color for label */
 }
 
 #loadGameOverlay .overlay-content select {
     width: 100%;
-    padding: 15px; /* More padding for select */
-    margin-bottom: 20px;
+    padding: 10px; /* Adjust padding */
+    margin-bottom: 15px;
     border-radius: 10px; /* Rounded corners for select */
     border: none;
     font-size: 1em;
@@ -240,15 +240,15 @@ body {
 #loadGameOverlay .overlay-content .button-group {
     display: flex;
     justify-content: space-around;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 #loadGameOverlay .overlay-content .btn {
-    padding: 15px 30px; /* More padding for buttons */
+    padding: 10px 20px; /* Adjust padding */
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 1.2em;
+    font-size: 1em; /* Adjust font size */
     background-color: #00FFFF; /* Vibrant button color */
     color: #000; /* Black text for button */
     transition: background-color 0.3s ease;
@@ -266,4 +266,19 @@ body {
 
 #loadGameOverlay .overlay-content .btn-secondary:hover {
     background-color: #cc0000; /* Darker red on hover */
+}
+
+.high-scores-tables {
+    display: flex;
+    justify-content: space-around; /* Adjust spacing as needed */
+    gap: 30px; /* Adjust the gap size as needed */
+}
+
+.high-scores-table {
+    flex: 1; /* Distribute space evenly */
+    margin: 0; /* Remove any default margins */
+}
+
+.high-scores-table h3 {
+    margin-top: 0; /* Remove top margin for table headings */
 }

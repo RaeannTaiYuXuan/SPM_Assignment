@@ -376,6 +376,9 @@ const earningRates = {
             }))
         };
         localStorage.setItem(`gameState_${fileName}`, JSON.stringify(gameState));
+
+        saveHighScore(fileName, gameState.score);
+
         alert('Game Saved!');
     }
         
@@ -808,6 +811,15 @@ const earningRates = {
     
         document.querySelector('.toolbar').classList.remove('toolbar-small');
     });
+
+    // Function to save high score
+    function saveHighScore(name, score) {
+        const highScores = JSON.parse(localStorage.getItem('freePlayHighScores')) || [];
+        highScores.push({ name, score });
+        highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
+        if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
+        localStorage.setItem('freePlayHighScores', JSON.stringify(highScores));
+    }
     
 
     updateDisplays();
