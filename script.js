@@ -756,17 +756,33 @@ const earningRates = {
             }
         }
     
-        // Adjust the CSS to make the screen smaller and the buttons lower
-        document.body.classList.add('grid-expanded');
-        cityGrid.style.transform = 'scale(0.75)'; // Scale down the grid
-        cityGrid.style.transformOrigin = 'center'; // Set the origin of scaling
+        // Calculate the new scale factor
+        const cityGrid = document.getElementById('cityGrid');
+        const gridContainer = document.getElementById('gridContainer');
+        const toolbarHeight = document.getElementById('toolbar').offsetHeight;
+        
+        const containerWidth = gridContainer.clientWidth;
+        const containerHeight = gridContainer.clientHeight - toolbarHeight;
     
-        // Move button container lower
-        document.querySelector('.button-container').style.marginTop = '150px';
-        document.querySelector('.toolbar').style.marginTop = '100px';
+        const scaleWidth = containerWidth / (gridSize * cellSize);
+        const scaleHeight = containerHeight / (gridSize * cellSize);
+        const newScale = Math.min(scaleWidth, scaleHeight); // Scale factor to ensure it fits
+    
+        // Update the grid scaling and position
+        cityGrid.style.transform = `scale(${newScale})`;
+    
+        // Optionally, center the grid within the container
+        const translateX = (containerWidth - (gridSize * cellSize * newScale)) / 2;
+        const translateY = (containerHeight - (gridSize * cellSize * newScale)) / 2;
+        cityGrid.style.transform = `scale(${newScale}) translate(${translateX}px, ${translateY}px)`;
     
         alert(`Grid expanded to ${gridSize}x${gridSize}!`);
     }
+    
+    
+    
+    
+    
     
 
     buildingButtons.residential.addEventListener('click', () => {

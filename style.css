@@ -10,6 +10,7 @@ body {
     background-image: url('bg.jpg'); /* Background image */
     background-size: cover;
     background-position: center;
+    overflow-x: auto; /* Enable horizontal scrolling */
 }
 
 .top-bar {
@@ -141,6 +142,7 @@ body {
     display: grid;
     grid-template-columns: repeat(5, 80px);
     grid-template-rows: repeat(5, 80px);
+    white-space: nowrap;
     gap: 5px; /* Space between cells */
     margin-top: 20px; /* Adjust margin to create space between the top bar and grid */
 }
@@ -192,8 +194,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute; /* Position the toolbar absolutely */
+    position: fixed; /* Position the toolbar absolutely */
     top: 50%; /* Place it at the vertical center */
+    margin-top: 70px;
     left: 20px; /* Adjust the distance from the left */
     transform: translateY(-50%); /* Center it vertically */
 }
@@ -257,7 +260,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px; /* Adjust margin to create space between the grid and buttons */
+    margin-top: 50px; /* Adjust margin to create space between the grid and buttons */
 }
 
 .city-grid-arcade {
