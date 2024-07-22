@@ -10,7 +10,7 @@ body {
     background-image: url('bg.jpg'); /* Background image */
     background-size: cover;
     background-position: center;
-    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow: hidden; /* Prevent body scrolling */
 }
 
 .top-bar {
@@ -37,6 +37,7 @@ body {
     flex: 1;
     text-align: center;
 }
+
 /* RULES */
 .sidebar {
     overflow-y: auto;
@@ -77,7 +78,7 @@ body {
     cursor: pointer;
     font-size: 30px;
 }
-.sidebar ul{
+.sidebar ul {
     line-height: 30px;
 }
 
@@ -92,7 +93,6 @@ body {
     margin: 0 10px;
 }
 
-
 .game-container {
     position: relative;
     display: flex;
@@ -100,6 +100,7 @@ body {
     align-items: center;
     justify-content: center; 
     flex-grow: 1; 
+    overflow: auto; /* Enable scrolling for the game container */
 }
 
 .grid-expanded .toolbar {
@@ -124,8 +125,6 @@ body {
     height: 30px; /* Smaller icon size */
 }
 
-
-
 .toolbar-small .button-text {
     font-size: 9px; 
     margin-bottom: 5px; 
@@ -145,6 +144,7 @@ body {
     white-space: nowrap;
     gap: 5px; /* Space between cells */
     margin-top: 20px; /* Adjust margin to create space between the top bar and grid */
+    overflow: auto; /* Enable scrolling for the grid */
 }
 
 .cell {
@@ -188,7 +188,6 @@ body {
 .cell.selected {
     border: 2px solid #FFFF00; /* Yellow border to indicate selection */
 }
-
 
 .toolbar {
     display: flex;
@@ -234,9 +233,6 @@ body {
     margin-top: auto; /* Ensure text is at the bottom */
     margin-bottom: 20px;
 }
-
-
-
 
 /* Add styles for the reset, save, and demolish buttons */
 .reset-button, .save-button, .demolish-button {
@@ -379,9 +375,7 @@ body {
     z-index: 1000;
 }
 
-
 /* icon */
-
 .icon-image {
     width: 100px; /* Adjust the size as needed */
     height: 100px; /* Adjust the size as needed */
