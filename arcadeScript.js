@@ -1,23 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Function to prevent back navigation
-    function preventBackNavigation() {
-        // Listen for popstate event
-        window.addEventListener('popstate', function(event) {
-            // Push a new state to prevent back navigation
-            history.pushState(null, null, location.href);
-        });
-    }
-
-    preventBackNavigation(); // Call the function to prevent back navigation
-
-    // Handle beforeunload event to prevent closing the tab or navigating away
-    window.addEventListener('beforeunload', function (e) {
-        // Cancel the event as stated by the standard
-        e.preventDefault();
-        // Chrome requires returnValue to be set
-        e.returnValue = '';
-    });
-
     const cityGridArcade = document.getElementById('cityGridArcade');
     const resetButtonArcade = document.getElementById('resetButtonArcade');
     const saveButtonArcade = document.getElementById('saveButtonArcade');
@@ -52,9 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveArcadeGame() {
-        // CHANGED HERE: Check if the game was loaded
         if (loadedGameName) {
-            // If the game is loaded and changes were made, save with the existing name
             const gameState = {
                 pageType: 'ArcadeGame',
                 coins: coins,
@@ -64,13 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     classes: Array.from(cell.classList),
                     innerHTML: cell.innerHTML
                 })),
-                score: calculateScore() // Ensure score is saved correctly
+                score: calculateScore()
             };
             localStorage.setItem(`arcadeGameState_${loadedGameName}`, JSON.stringify(gameState));
-
-            // Save high score
             saveHighScore(loadedGameName, gameState.score);
-
             alert('Game Saved!');
         } else {
             const fileName = prompt("Enter a name for your save game:");
@@ -96,13 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     classes: Array.from(cell.classList),
                     innerHTML: cell.innerHTML
                 })),
-                score: calculateScore() // Ensure score is saved correctly
+                score: calculateScore()
             };
             localStorage.setItem(`arcadeGameState_${fileName}`, JSON.stringify(gameState));
-
-            // Save high score
             saveHighScore(fileName, gameState.score);
-
             alert('Game Saved!');
         }
     }
@@ -115,12 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const { coins: savedCoins, roundNo: savedRoundNo, grid: savedGrid, cells: savedCells, score: savedScore } = JSON.parse(gameState);
 
-        coins = savedCoins + 1; // Add one coin to the saved state
+        coins = savedCoins + 1;
         roundNo = savedRoundNo;
         grid = savedGrid;
-        gameLoaded = true; // Indicate that the game has been loaded
-            cells[index].className = 'cell-arcade';
-        loadedGameName = sessionStorage.getItem('loadedGameName');  // CHANGED HERE: Store the loaded game name
+        gameLoaded = true;
+        loadedGameName = sessionStorage.getItem('loadedGameName');
 
         const cells = document.querySelectorAll('.cell-arcade');
         savedCells.forEach((savedCell, index) => {
@@ -132,15 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
         coinsHTML.textContent = `Coins: ${coins}`;
         scoreDisplay.textContent = `Score: ${savedScore}`;
         sessionStorage.removeItem('loadedGameState');
-        sessionStorage.removeItem('loadedGameName');  // CHANGED HERE: Remove the loaded game name from session storage
+        sessionStorage.removeItem('loadedGameName');
 
-        updateScoreDisplay(); // Ensure score is updated correctly
-        updateCoinsDisplay(); // Ensure coins are updated correctly
+        updateScoreDisplay();
+        updateCoinsDisplay();
 
-        // Disable all building buttons initially
         greyOutBuildings([]);
 
-        // Determine which buildings should be available based on the current game state
         if (coins > 0) {
             const buildings = ['residential', 'industry', 'commercial', 'park', 'road'];
             let selectedBuildings = [];
@@ -212,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleBuildingClick(event) {
         const building = event.currentTarget.id.replace('Button', '');
         currentBuilding = building;
-        demolitionMode = false; // Disable demolition mode when a building button is clicked
+        demolitionMode = false;
     }
 
     function handleCellClick(cell, index, event) {
@@ -366,6 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        
+        
         return 'none';
     }
     
@@ -386,6 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'road':
                 const orientation = roadOrientation(row, col, gridSize);
+                console.log('ORIENTATION:', orientation);
                 if (orientation === 'horizontal') {
                     icon = createImage("road_horizontal.png", "road-horizontal-animation");
                 } else if (orientation === 'topLeftCorner') {
@@ -396,9 +369,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon = createImage("road_top_right.png", "road-top-right-animation");
                 } else if (orientation === 'bottomRightCorner') {
                     icon = createImage("road_bottom_right.png", "road-bottom-right-animation");
-                } else if (orientation === 'none'){
+                }else if (orientation === 'none'){
                     icon = createImage("road.png", "road-default-animation");
-                } else {
+                } 
+                else {
                     icon = createImage("road.png", "road-default-animation");
                 }
                 break;
@@ -482,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return 1;
         }
         for (let neighbor of neighbors) {
-            if (grid[neighbor[0]][neighbor[1]] === 'residential' || grid[neighbor[0]][neighbor[1]] === 'commercial') {
+            if (grid[neighbor[0]][neighbor[1]] === 'residential' || grid[neighbor[1]][neighbor[1]] === 'commercial') {
                 score += 1;
             } else if (grid[neighbor[0]][neighbor[1]] === 'park') {
                 score += 2;
@@ -590,7 +564,11 @@ document.addEventListener('DOMContentLoaded', () => {
         highScores.push({ name, score });
         highScores.sort((a, b) => b.score - a.score); // Sort by score in descending order
         if (highScores.length > 10) highScores.pop(); // Keep only top 10 scores
-        localStorage.setItem('arcadeHighScores', JSON.stringify(highScores));
+        localStorage.setItem('highScores', JSON.stringify(highScores));
+    }
+
+    function getHighScores() {
+        return JSON.parse(localStorage.getItem('highScores')) || [];
     }
 
     loadGameState();
